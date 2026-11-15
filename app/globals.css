@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default: Dark Theme */
+  --bg-color: #030014;
+  --surface-color: #050414;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --card-bg: rgba(13, 10, 31, 0.65);
+  --card-hover-bg: rgba(19, 16, 43, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --grid-line: rgba(255, 255, 255, 0.02);
+  --nav-bg: rgba(3, 0, 20, 0.85);
+  --primary-purple: #8245ec;
+  --secondary-purple: #a78bfa;
+  --accent-pink: #e879f9;
+  --accent-cyan: #38bdf8;
+}
+
+html.light {
+  /* Light Theme */
+  --bg-color: #f8fafc;
+  --surface-color: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-hover-bg: rgba(255, 255, 255, 0.98);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --grid-line: rgba(15, 23, 42, 0.03);
+  --nav-bg: rgba(255, 255, 255, 0.88);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b3558;
+  border-radius: 9999px;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8245ec;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(167, 139, 250, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(130, 69, 236, 0.25);
+}
+
+html.light .glass-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+html.light .glass-card:hover {
+  box-shadow: 0 14px 30px -4px rgba(130, 69, 236, 0.15);
+}
+
+/* Neon Glows */
+.glow-purple {
+  box-shadow: 0 0 35px rgba(130, 69, 236, 0.35);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+}
+
+/* Radial background glow effects */
+.bg-glow-spot {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+html.light .bg-glow-spot {
+  opacity: 0.12;
+}
+
+/* Cyber grid background */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+}
