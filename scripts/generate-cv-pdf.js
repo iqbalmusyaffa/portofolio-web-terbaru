@@ -1,0 +1,122 @@
+const fs = require('fs');
+const path = require('path');
+
+// Simple script to generate a clean, valid PDF 1.4 document for Iqbal Musyaffa
+function createPdf() {
+  const content = `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Length 1200 >>
+stream
+BT
+/F1 22 Tf
+50 740 Td
+(IQBAL MUSYAFFA YUSA'BBIH LILLAH) Tj
+/F1 12 Tf
+0 -24 Td
+(Software Engineer | Fullstack Developer | Backend Specialist) Tj
+/F2 10 Tf
+0 -18 Td
+(Email: contact@iqbaldeveloper.my.id | Lokasi: Surabaya, Jawa Timur, Indonesia) Tj
+0 -14 Td
+(Portfolio: https://iqbalmusyaffa.my.id | GitHub: github.com/iqbalmusyaffa) Tj
+
+/F1 13 Tf
+0 -28 Td
+(RINGKASAN PROFESIONAL) Tj
+/F2 10 Tf
+0 -16 Td
+(Lulusan S1 Sistem Informasi Telkom University Surabaya dengan keahlian dalam perancangan dan) Tj
+0 -14 Td
+(pengembangan aplikasi web modern yang scalable, aman, dan berkinerja tinggi. Berpengalaman) Tj
+0 -14 Td
+(dalam ekosistem Next.js, React, Node.js, Express, Laravel, serta optimasi database relasional MySQL.) Tj
+
+/F1 13 Tf
+0 -26 Td
+(PENDIDIKAN) Tj
+/F1 11 Tf
+0 -16 Td
+(Universitas Telkom Surabaya - S1 Sistem Informasi (IPK: 3.40 / 4.00)) Tj
+/F2 10 Tf
+0 -14 Td
+(2020 - 2024 | Fokus: Rekayasa Perangkat Lunak, Manajemen Basis Data, dan Arsitektur Sistem) Tj
+
+/F1 13 Tf
+0 -26 Td
+(PENGALAMAN KERJA & BOOTCAMP) Tj
+/F1 11 Tf
+0 -16 Td
+(Fullstack Web Developer - PT PastiDjadi Teknologi Kreatif) Tj
+/F2 10 Tf
+0 -14 Td
+(Mei 2024 - Sekarang | Mengembangkan modul frontend React/Next.js dan backend RESTful API Laravel.) Tj
+
+/F1 11 Tf
+0 -18 Td
+(Virtual Internship - PT Deus Digital Transformasi Universal) Tj
+/F2 10 Tf
+0 -14 Td
+(April 2024 - Juni 2024 | Perancangan arsitektur database MySQL dan optimasi integrasi API.) Tj
+
+/F1 13 Tf
+0 -26 Td
+(KEAHLIAN UTAMA (TECH STACK)) Tj
+/F2 10 Tf
+0 -16 Td
+(- Frontend: JavaScript, TypeScript, React.js, Next.js, Tailwind CSS, Bootstrap, HTML5/CSS3) Tj
+0 -14 Td
+(- Backend: Node.js, Express.js, Laravel (PHP), RESTful API, JWT Auth (AES-256-GCM), WebSockets) Tj
+0 -14 Td
+(- Database & Tools: MySQL, PostgreSQL, Git/GitHub, Docker, Postman, Linux Environment) Tj
+
+/F1 13 Tf
+0 -26 Td
+(SERTIFIKASI & PENGHARGAAN) Tj
+/F2 10 Tf
+0 -16 Td
+(- Sertifikat Hak Kekayaan Intelektual (HKI) - Universitas Telkom (2024)) Tj
+0 -14 Td
+(- Ethical Hacker For Dummies - Digital Talent Scholarship (Komdigi) (2025)) Tj
+0 -14 Td
+(- Cloud and Gen AI on AWS - Dicoding Indonesia (2025)) Tj
+0 -14 Td
+(- Belajar Dasar Structured Query Language (SQL) - Dicoding Indonesia (2025)) Tj
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000244 00000 n 
+0000000318 00000 n 
+0000000387 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+1639
+%%EOF`;
+
+  const outputPath = path.resolve(__dirname, '../public/cv-iqbal-musyaffa.pdf');
+  fs.writeFileSync(outputPath, content, 'utf8');
+  console.log('PDF CV created successfully at:', outputPath);
+}
+
+createPdf();

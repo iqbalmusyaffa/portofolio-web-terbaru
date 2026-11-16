@@ -34,6 +34,7 @@ export async function PUT(request) {
       bio,
       avatar_url,
       cv_url,
+      cv_pdf_url,
       github_url,
       linkedin_url,
       instagram_url,
@@ -66,6 +67,7 @@ export async function PUT(request) {
     const cleanBio = sanitizeString(bio || '', 3000);
     const cleanAvatar = sanitizeString(avatar_url || '', 500);
     const cleanCv = sanitizeString(cv_url || '', 500);
+    const cleanCvPdf = sanitizeString(cv_pdf_url || '/cv-iqbal-musyaffa.pdf', 500);
     const cleanGithub = sanitizeString(github_url || '', 255);
     const cleanLinkedin = sanitizeString(linkedin_url || '', 255);
     const cleanInstagram = sanitizeString(instagram_url || '', 255);
@@ -109,7 +111,7 @@ export async function PUT(request) {
       await query(
         `UPDATE profile SET 
           name = ?, full_name = ?, tagline = ?, roles = ?, bio = ?, avatar_url = ?, 
-          cv_url = ?, github_url = ?, linkedin_url = ?, instagram_url = ?, facebook_url = ?, 
+          cv_url = ?, cv_pdf_url = ?, github_url = ?, linkedin_url = ?, instagram_url = ?, facebook_url = ?, 
           email = ?, location = ?,
           about_title = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?,
           code_philosophy_title = ?, code_philosophy_desc = ?, gpa_score = ?,
@@ -118,7 +120,7 @@ export async function PUT(request) {
          WHERE id = ?`,
         [
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
-          cleanCv, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
+          cleanCv, cleanCvPdf, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
           cleanEmail, cleanLocation,
           cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
           cleanPhilTitle, cleanPhilDesc, cleanGpa,
@@ -129,16 +131,16 @@ export async function PUT(request) {
     } else {
       await query(
         `INSERT INTO profile (
-          name, full_name, tagline, roles, bio, avatar_url, cv_url, github_url,
+          name, full_name, tagline, roles, bio, avatar_url, cv_url, cv_pdf_url, github_url,
           linkedin_url, instagram_url, facebook_url, email, location,
           about_title, about_bio_2, about_highlights, availability_status,
           code_philosophy_title, code_philosophy_desc, gpa_score,
           meta_title, meta_description, meta_keywords, og_image,
           canonical_url, google_site_verification
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
-          cleanCv, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
+          cleanCv, cleanCvPdf, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
           cleanEmail, cleanLocation,
           cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
           cleanPhilTitle, cleanPhilDesc, cleanGpa,

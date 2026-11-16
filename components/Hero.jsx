@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Download, Github, Linkedin, Instagram, Facebook, ArrowRight, Sparkles } from 'lucide-react';
+import { Download, Github, Linkedin, Instagram, Facebook, ArrowRight, Sparkles, ExternalLink } from 'lucide-react';
 
 export default function Hero({ profile }) {
   const defaultRoles = ["Software Engineer", "Fullstack Developer", "Problem Solver"];
@@ -53,6 +53,7 @@ export default function Hero({ profile }) {
   const name = profile?.name || "Iqbal Musyaffa";
   const bio = profile?.bio || "Lulusan Universitas Telkom Surabaya yang senang menerjemahkan ide menjadi antarmuka web yang bersih dan efisien. Berpengalaman membangun aplikasi dengan ekosistem Laravel & React. Fokus utama saya bukan sekadar menulis kode, tapi memberikan dampak nyata bagi pengguna dan tim.";
   const cvUrl = profile?.cv_url || "https://drive.google.com/drive/folders/1Pot8GeUM6s_4J7n_8VlcULaMaycx1sD4?usp=sharing";
+  const cvPdfUrl = profile?.cv_pdf_url || "/cv-iqbal-musyaffa.pdf";
   const avatarUrl = profile?.avatar_url || "/foto2.jpg";
 
   return (
@@ -113,20 +114,36 @@ export default function Hero({ profile }) {
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-10 w-full sm:w-auto">
-          <a
-            href={cvUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:from-[#7335de] hover:to-[#9333ea] shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 active:scale-95 transition-all duration-200"
-          >
-            <span>Lihat CV</span>
-            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-          </a>
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 w-full sm:w-auto">
+          {/* Direct Download PDF Button with Drive Option */}
+          <div className="inline-flex items-center rounded-full bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] p-0.5 shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 active:scale-95 transition-all duration-200">
+            <a
+              href={cvPdfUrl}
+              download="CV_Iqbal_Musyaffa.pdf"
+              className="inline-flex items-center gap-2 pl-6 pr-4 py-3 text-sm sm:text-base font-semibold text-white hover:bg-white/10 rounded-l-full transition-colors cursor-pointer"
+              title="Unduh langsung file CV (PDF)"
+            >
+              <Download className="w-4 h-4 animate-bounce" />
+              <span>Unduh CV</span>
+            </a>
+
+            <div className="w-[1px] h-5 bg-white/30" />
+
+            <a
+              href={cvUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 pl-3 pr-5 py-3 text-xs sm:text-sm font-semibold text-purple-100 hover:text-white hover:bg-white/10 rounded-r-full transition-colors cursor-pointer"
+              title="Buka di Google Drive"
+            >
+              <span>Drive</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
 
           <a
             href="#contact"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 hover:border-purple-400/50 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-md"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 hover:border-purple-400/50 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-md shadow-sm"
           >
             <span>Hubungi Saya</span>
             <ArrowRight className="w-4 h-4 text-[#8245ec] dark:text-[#a78bfa]" />

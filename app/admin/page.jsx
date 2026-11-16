@@ -1007,9 +1007,9 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Link Foto Profil / Avatar</label>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Foto Avatar URL</label>
                     <input
                       type="text"
                       value={profile.avatar_url || ''}
@@ -1024,6 +1024,16 @@ export default function AdminPage() {
                       type="text"
                       value={profile.cv_url || ''}
                       onChange={(e) => setProfile({ ...profile, cv_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">File / Link Direct PDF CV</label>
+                    <input
+                      type="text"
+                      value={profile.cv_pdf_url || ''}
+                      onChange={(e) => setProfile({ ...profile, cv_pdf_url: e.target.value })}
+                      placeholder="/cv-iqbal-musyaffa.pdf"
                       className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
                     />
                   </div>
