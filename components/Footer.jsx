@@ -12,14 +12,11 @@ export default function Footer({ profile }) {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Left branding */}
         <div className="text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-1 font-heading text-lg font-bold text-gray-900 dark:text-white mb-1">
+          <div className="flex items-center justify-center md:justify-start gap-1 font-heading text-lg font-bold text-gray-900 dark:text-white">
             <span className="text-[#8245ec] dark:text-[#a78bfa]">&lt;</span>
             <span>{profile?.name || 'Iqbal Musyaffa'}</span>
             <span className="text-[#8245ec]">/&gt;</span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Dibuat menggunakan <strong className="text-gray-800 dark:text-gray-200">Next.js</strong>, <strong className="text-gray-800 dark:text-gray-200">Tailwind CSS</strong>, dan database <strong className="text-purple-600 dark:text-purple-300">MySQL</strong>.
-          </p>
         </div>
 
         {/* Social Links */}
