@@ -8,6 +8,7 @@ import Projects from '@/components/Projects';
 import Certifications from '@/components/Certifications';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import LoadingScreen from '@/components/LoadingScreen';
 
 import {
   initialProfile,
@@ -61,6 +62,9 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen bg-[#f8fafc] dark:bg-[#030014] text-gray-900 dark:text-white overflow-hidden bg-grid-pattern transition-colors duration-300">
+      {/* Animated Loading Screen */}
+      <LoadingScreen />
+
       {/* Background ambient lighting */}
       <div className="bg-glow-spot top-0 left-1/4 bg-purple-600/20" />
       <div className="bg-glow-spot top-1/3 right-10 bg-indigo-600/15" />
