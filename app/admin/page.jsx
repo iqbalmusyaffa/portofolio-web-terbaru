@@ -26,7 +26,8 @@ import {
   Check,
   X,
   Search,
-  Sparkles
+  Sparkles,
+  Globe
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -577,7 +578,8 @@ export default function AdminPage() {
             { id: 'experience', label: 'Pengalaman', icon: Briefcase, count: experiences.length },
             { id: 'education', label: 'Pendidikan', icon: GraduationCap, count: educations.length },
             { id: 'certificates', label: 'Sertifikasi', icon: Award, count: certificates.length },
-            { id: 'profile', label: 'Biodata & Sosial', icon: User },
+            { id: 'profile', label: 'Biodata & About Me', icon: User },
+            { id: 'seo', label: 'Pengaturan SEO', icon: Globe },
             { id: 'messages', label: 'Pesan Masuk', icon: MessageSquare, count: messages.filter(m => !m.is_read).length, isBadge: true },
             { id: 'security', label: 'Keamanan Akun', icon: Shield },
           ].map((tab) => {
@@ -939,116 +941,400 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ==================== TAB 6: PROFILE ==================== */}
+        {/* ==================== TAB 6: PROFILE & ABOUT ME ==================== */}
         {activeTab === 'profile' && (
-          <div className="max-w-3xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-6 animate-fadeIn shadow-2xl">
+          <div className="max-w-4xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-8 animate-fadeIn shadow-2xl">
             <div>
-              <h2 className="text-xl font-bold font-heading text-white">Biodata & Link Sosial</h2>
-              <p className="text-xs text-gray-400">Informasi utama ini tampil di Hero dan Kontak website</p>
+              <h2 className="text-xl font-bold font-heading text-white">Biodata & Konten About Me</h2>
+              <p className="text-xs text-gray-400">Kelola identitas utama, ringkasan bio, checklist keahlian, dan filosofi kode yang tampil di website</p>
             </div>
 
-            <form onSubmit={saveProfile} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Tampilan</label>
-                  <input
-                    type="text"
-                    value={profile.name || ''}
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
+            <form onSubmit={saveProfile} className="space-y-6">
+              {/* Bagian 1: Identitas Utama */}
+              <div className="space-y-4 pt-2">
+                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
+                  1. Identitas Utama & Kontak
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Tampilan</label>
+                    <input
+                      type="text"
+                      value={profile.name || ''}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Lengkap & Gelar</label>
+                    <input
+                      type="text"
+                      value={profile.full_name || ''}
+                      onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Lengkap</label>
-                  <input
-                    type="text"
-                    value={profile.full_name || ''}
-                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Tagline</label>
+                    <input
+                      type="text"
+                      value={profile.tagline || ''}
+                      onChange={(e) => setProfile({ ...profile, tagline: e.target.value })}
+                      placeholder="Software Engineer"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Alamat Email</label>
+                    <input
+                      type="email"
+                      value={profile.email || ''}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Lokasi</label>
+                    <input
+                      type="text"
+                      value={profile.location || ''}
+                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Link Foto Profil / Avatar</label>
+                    <input
+                      type="text"
+                      value={profile.avatar_url || ''}
+                      onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value })}
+                      placeholder="/foto2.jpg"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Link Google Drive CV</label>
+                    <input
+                      type="text"
+                      value={profile.cv_url || ''}
+                      onChange={(e) => setProfile({ ...profile, cv_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-200 mb-1">Ringkasan Bio</label>
-                <textarea
-                  rows={4}
-                  value={profile.bio || ''}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Link Google Drive CV</label>
-                  <input
-                    type="text"
-                    value={profile.cv_url || ''}
-                    onChange={(e) => setProfile({ ...profile, cv_url: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Alamat Email</label>
-                  <input
-                    type="email"
-                    value={profile.email || ''}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">GitHub URL</label>
-                  <input
-                    type="text"
-                    value={profile.github_url || ''}
-                    onChange={(e) => setProfile({ ...profile, github_url: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">LinkedIn URL</label>
-                  <input
-                    type="text"
-                    value={profile.linkedin_url || ''}
-                    onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
+              {/* Bagian 2: Media Sosial */}
+              <div className="space-y-4 pt-2">
+                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
+                  2. Media Sosial
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">GitHub URL</label>
+                    <input
+                      type="text"
+                      value={profile.github_url || ''}
+                      onChange={(e) => setProfile({ ...profile, github_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">LinkedIn URL</label>
+                    <input
+                      type="text"
+                      value={profile.linkedin_url || ''}
+                      onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Instagram URL</label>
+                    <input
+                      type="text"
+                      value={profile.instagram_url || ''}
+                      onChange={(e) => setProfile({ ...profile, instagram_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Facebook URL</label>
+                    <input
+                      type="text"
+                      value={profile.facebook_url || ''}
+                      onChange={(e) => setProfile({ ...profile, facebook_url: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Bagian 3: Konten Section About Me */}
+              <div className="space-y-4 pt-2">
+                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
+                  3. Konten Section About Me
+                </h3>
+                
                 <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Instagram URL</label>
+                  <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Utama About</label>
                   <input
                     type="text"
-                    value={profile.instagram_url || ''}
-                    onChange={(e) => setProfile({ ...profile, instagram_url: e.target.value })}
+                    value={profile.about_title || ''}
+                    onChange={(e) => setProfile({ ...profile, about_title: e.target.value })}
+                    placeholder="Dedikasi untuk Solusi Digital Berkualitas"
                     className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 1 Bio</label>
+                    <textarea
+                      rows={4}
+                      value={profile.bio || ''}
+                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                      placeholder="Saya adalah lulusan S1 Sistem Informasi Universitas Telkom Surabaya..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 2 Bio</label>
+                    <textarea
+                      rows={4}
+                      value={profile.about_bio_2 || ''}
+                      onChange={(e) => setProfile({ ...profile, about_bio_2: e.target.value })}
+                      placeholder="Dengan pengalaman dalam ekosistem modern seperti Next.js, React, Node.js..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Facebook URL</label>
-                  <input
-                    type="text"
-                    value={profile.facebook_url || ''}
-                    onChange={(e) => setProfile({ ...profile, facebook_url: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                  <label className="block text-xs font-semibold text-gray-200 mb-1">
+                    Checklist Poin Keahlian / Highlights (Pisahkan dengan baris baru / Enter)
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={
+                      (() => {
+                        if (!profile.about_highlights) return '';
+                        try {
+                          const parsed = typeof profile.about_highlights === 'string'
+                            ? (profile.about_highlights.startsWith('[') ? JSON.parse(profile.about_highlights) : profile.about_highlights)
+                            : profile.about_highlights;
+                          return Array.isArray(parsed) ? parsed.join('\n') : String(profile.about_highlights);
+                        } catch (e) {
+                          return String(profile.about_highlights || '');
+                        }
+                      })()
+                    }
+                    onChange={(e) => setProfile({ ...profile, about_highlights: e.target.value })}
+                    placeholder="Pengembangan web modern end-to-end (Frontend & Backend)&#10;Arsitektur RESTful API performa tinggi & keamanan JWT&#10;Optimasi database relasional MySQL & query efisien"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm font-mono text-xs focus:outline-none focus:border-purple-400"
                   />
+                  <span className="text-[11px] text-gray-400">Setiap baris akan otomatis menjadi 1 item checklist berikon centang di website.</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Keterangan Lokasi & Ketersediaan</label>
+                    <textarea
+                      rows={2}
+                      value={profile.availability_status || ''}
+                      onChange={(e) => setProfile({ ...profile, availability_status: e.target.value })}
+                      placeholder="Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun Freelance..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nilai IPK Telkom</label>
+                    <input
+                      type="text"
+                      value={profile.gpa_score || ''}
+                      onChange={(e) => setProfile({ ...profile, gpa_score: e.target.value })}
+                      placeholder="3.40"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Filosofi Kode</label>
+                    <input
+                      type="text"
+                      value={profile.code_philosophy_title || ''}
+                      onChange={(e) => setProfile({ ...profile, code_philosophy_title: e.target.value })}
+                      placeholder="Clean, Fast & Impactful"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-200 mb-1">Deskripsi Filosofi Kode</label>
+                    <textarea
+                      rows={3}
+                      value={profile.code_philosophy_desc || ''}
+                      onChange={(e) => setProfile({ ...profile, code_philosophy_desc: e.target.value })}
+                      placeholder="Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-3">
+              <div className="pt-4 border-t border-purple-900/30">
                 <button
                   type="submit"
                   className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Simpan Perubahan Biodata</span>
+                  <span>Simpan Perubahan Biodata & About Me</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ==================== TAB 7: SEO & METADATA ==================== */}
+        {activeTab === 'seo' && (
+          <div className="max-w-4xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-8 animate-fadeIn shadow-2xl">
+            <div>
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-cyan-400" />
+                <h2 className="text-xl font-bold font-heading text-white">Pengaturan SEO & OpenGraph</h2>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Atur judul, deskripsi pencarian Google, kata kunci, dan gambar thumbnail sosial media untuk WhatsApp, Facebook, Twitter/X, dan LinkedIn.
+              </p>
+            </div>
+
+            {/* Live Google Search Results Snippet Preview */}
+            <div className="p-5 rounded-2xl bg-[#030014] border border-purple-500/30 space-y-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                <span>Pratinjau Hasil Pencarian Google (Live Search Snippet)</span>
+              </div>
+
+              <div className="pt-2">
+                <div className="text-[12px] text-gray-400 font-mono truncate">
+                  {profile.canonical_url || 'https://iqbalmusyaffa.my.id'}
+                </div>
+                <h4 className="text-base sm:text-lg font-semibold text-[#8ab4f8] hover:underline cursor-pointer truncate">
+                  {profile.meta_title || `${profile.name || 'Iqbal Musyaffa'} - Software Engineer & Fullstack Developer`}
+                </h4>
+                <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
+                  {profile.meta_description || profile.bio || 'Portofolio profesional Iqbal Musyaffa - Software Engineer & Fullstack Developer lulusan Telkom University Surabaya.'}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={saveProfile} className="space-y-5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-200 mb-1">
+                  Judul Website (Meta Title) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={profile.meta_title || ''}
+                  onChange={(e) => setProfile({ ...profile, meta_title: e.target.value })}
+                  placeholder="Iqbal Musyaffa - Software Engineer & Fullstack Developer"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                />
+                <span className="text-[11px] text-gray-400">Tampil sebagai judul tab browser dan judul link di Google (Ideal: 50-60 karakter).</span>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-semibold text-gray-200">
+                    Deskripsi Mesin Pencari (Meta Description) *
+                  </label>
+                  <span className="text-[11px] text-purple-300">
+                    {(profile.meta_description || '').length} / 160 karakter
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  required
+                  value={profile.meta_description || ''}
+                  onChange={(e) => setProfile({ ...profile, meta_description: e.target.value })}
+                  placeholder="Portofolio resmi Iqbal Musyaffa - Software Engineer & Fullstack Developer lulusan Telkom University Surabaya..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                />
+                <span className="text-[11px] text-gray-400">Tampil sebagai ringkasan teks di bawah judul pencarian Google dan saat dibagikan ke WhatsApp.</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-200 mb-1">
+                  Kata Kunci Pencarian (Meta Keywords)
+                </label>
+                <textarea
+                  rows={2}
+                  value={profile.meta_keywords || ''}
+                  onChange={(e) => setProfile({ ...profile, meta_keywords: e.target.value })}
+                  placeholder="Iqbal Musyaffa, Software Engineer, Fullstack Developer, Next.js, React, Laravel, MySQL, Portfolio"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                />
+                <span className="text-[11px] text-gray-400">Pisahkan setiap kata kunci pencarian dengan koma (,).</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-200 mb-1">
+                    URL Domain Resmi (Canonical URL)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.canonical_url || ''}
+                    onChange={(e) => setProfile({ ...profile, canonical_url: e.target.value })}
+                    placeholder="https://iqbalmusyaffa.my.id/"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                  />
+                  <span className="text-[11px] text-gray-400">URL utama situs untuk mencegah duplikasi konten SEO.</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-200 mb-1">
+                    Gambar Thumbnail Sosial (OpenGraph Image URL)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.og_image || ''}
+                    onChange={(e) => setProfile({ ...profile, og_image: e.target.value })}
+                    placeholder="/foto2.jpg"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                  />
+                  <span className="text-[11px] text-gray-400">Gambar kartu pratinjau yang muncul saat link website dikirim di WhatsApp atau sosmed.</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-200 mb-1">
+                  Google Search Console Verification Tag (Opsional)
+                </label>
+                <input
+                  type="text"
+                  value={profile.google_site_verification || ''}
+                  onChange={(e) => setProfile({ ...profile, google_site_verification: e.target.value })}
+                  placeholder="Kode verifikasi Google Search Console (content code)"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+                />
+                <span className="text-[11px] text-gray-400">Masukkan kode verifikasi HTML tag Google untuk memantau performa ranking website Anda.</span>
+              </div>
+
+              <div className="pt-4 border-t border-purple-900/30">
+                <button
+                  type="submit"
+                  className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-cyan-600 via-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Simpan Pengaturan SEO & Metadata</span>
                 </button>
               </div>
             </form>

@@ -57,6 +57,62 @@ async function getPortfolioData() {
   }
 }
 
+export async function generateMetadata() {
+  const data = await getPortfolioData();
+  const p = data.profile || initialProfile;
+
+  const title = p.meta_title || `${p.name} - ${p.tagline || 'Software Engineer'}`;
+  const description = p.meta_description || p.bio || 'Portofolio Iqbal Musyaffa - Software Engineer & Fullstack Developer';
+  const siteUrl = p.canonical_url || 'https://iqbalmusyaffa.my.id/';
+  const ogImg = p.og_image || '/foto2.jpg';
+
+  let metadataBase;
+  try {
+    metadataBase = new URL(siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`);
+  } catch (e) {
+    metadataBase = new URL('https://iqbalmusyaffa.my.id/');
+  }
+
+  return {
+    title,
+    description,
+    keywords: p.meta_keywords || 'Iqbal Musyaffa, Software Engineer, Fullstack Developer, Next.js, MySQL',
+    authors: [{ name: p.name, url: siteUrl }],
+    creator: p.name,
+    metadataBase,
+    alternates: {
+      canonical: siteUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: siteUrl,
+      siteName: `${p.name} Portfolio`,
+      images: [
+        {
+          url: ogImg,
+          width: 1200,
+          height: 630,
+          alt: p.name,
+        },
+      ],
+      locale: 'id_ID',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImg],
+    },
+    ...(p.google_site_verification ? {
+      verification: {
+        google: p.google_site_verification
+      }
+    } : {})
+  };
+}
+
 export default async function HomePage() {
   const data = await getPortfolioData();
 

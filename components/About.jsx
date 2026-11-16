@@ -7,16 +7,27 @@ export default function About({ profile, projectCount, certCount, expCount }) {
     { label: 'Proyek Selesai', value: `${projectCount || 6}+`, icon: Code2, desc: 'Web & Backend' },
     { label: 'Sertifikasi', value: `${certCount || 17}+`, icon: Award, desc: 'Dicoding & Komdigi' },
     { label: 'Pengalaman', value: `${expCount || 2}+`, icon: Briefcase, desc: 'Intern & Bootcamp' },
-    { label: 'IPK Telkom', value: '3.40', icon: GraduationCap, desc: 'S1 Sistem Informasi' },
+    { label: 'IPK Telkom', value: profile?.gpa_score || '3.40', icon: GraduationCap, desc: 'S1 Sistem Informasi' },
   ];
 
-  const highlights = [
+  let highlights = [
     'Pengembangan web modern end-to-end (Frontend & Backend)',
     'Arsitektur RESTful API performa tinggi & keamanan JWT',
     'Optimasi database relasional MySQL & query efisien',
     'Pengalaman kerja nyata di industri dan tim kolaboratif',
     'Penerapan clean code, reusable components & SEO friendly'
   ];
+
+  if (profile?.about_highlights) {
+    try {
+      const parsed = typeof profile.about_highlights === 'string'
+        ? JSON.parse(profile.about_highlights)
+        : profile.about_highlights;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        highlights = parsed;
+      }
+    } catch (e) {}
+  }
 
   return (
     <section id="about" className="py-20 px-4 relative z-10">
@@ -59,20 +70,22 @@ export default function About({ profile, projectCount, certCount, expCount }) {
         </div>
 
         {/* Story & Highlights */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-lg dark:shadow-none">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-heading mb-4 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#8245ec]" />
-              Dedikasi untuk Solusi Digital Berkualitas
+              {profile?.about_title || 'Dedikasi untuk Solusi Digital Berkualitas'}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              Saya adalah lulusan <strong>S1 Sistem Informasi Universitas Telkom Surabaya</strong> yang memiliki passion mendalam pada perancangan dan pembangunan aplikasi web yang scalable, responsif, dan mudah digunakan.
+              {profile?.bio || 'Saya adalah lulusan S1 Sistem Informasi Universitas Telkom Surabaya yang memiliki passion mendalam pada perancangan dan pembangunan aplikasi web yang scalable, responsif, dan mudah digunakan.'}
             </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed mb-6">
-              Dengan pengalaman dalam ekosistem modern seperti <strong>Next.js, React, Node.js, Laravel, dan MySQL</strong>, saya siap berkontribusi secara nyata dalam menyelesaikan tantangan bisnis melalui solusi teknologi yang tepat sasaran.
-            </p>
+            {profile?.about_bio_2 && (
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed mb-6">
+                {profile.about_bio_2}
+              </p>
+            )}
 
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 mt-4">
               {highlights.map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                   <CheckCircle2 className="w-4 h-4 text-purple-600 dark:text-[#a78bfa] shrink-0 mt-0.5" />
@@ -88,10 +101,10 @@ export default function About({ profile, projectCount, certCount, expCount }) {
                 Lokasi & Ketersediaan
               </div>
               <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                Surabaya, Jawa Timur, Indonesia
+                {profile?.location || 'Surabaya, Jawa Timur, Indonesia'}
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun Freelance di bidang Software Engineering.
+                {profile?.availability_status || 'Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun Freelance di bidang Software Engineering.'}
               </p>
             </div>
 
@@ -100,10 +113,10 @@ export default function About({ profile, projectCount, certCount, expCount }) {
                 Filosofi Kode
               </div>
               <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                Clean, Fast & Impactful
+                {profile?.code_philosophy_title || 'Clean, Fast & Impactful'}
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem yang stabil, mudah dirawat, dan memberikan dampak positif bagi para penggunanya.
+                {profile?.code_philosophy_desc || 'Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem yang stabil, mudah dirawat, dan memberikan dampak positif bagi para penggunanya.'}
               </p>
             </div>
           </div>

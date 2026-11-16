@@ -39,7 +39,24 @@ export async function PUT(request) {
       instagram_url,
       facebook_url,
       email,
-      location
+      location,
+
+      // About Section Fields
+      about_title,
+      about_bio_2,
+      about_highlights,
+      availability_status,
+      code_philosophy_title,
+      code_philosophy_desc,
+      gpa_score,
+
+      // SEO & OpenGraph Fields
+      meta_title,
+      meta_description,
+      meta_keywords,
+      og_image,
+      canonical_url,
+      google_site_verification
     } = body;
 
     // Sanitize values
@@ -56,6 +73,33 @@ export async function PUT(request) {
     const cleanEmail = sanitizeString(email || '', 150);
     const cleanLocation = sanitizeString(location || '', 150);
 
+    // About sanitization
+    const cleanAboutTitle = sanitizeString(about_title || 'Dedikasi untuk Solusi Digital Berkualitas', 255);
+    const cleanAboutBio2 = sanitizeString(about_bio_2 || '', 3000);
+    let highlightsStr = '[]';
+    if (Array.isArray(about_highlights)) {
+      highlightsStr = JSON.stringify(about_highlights);
+    } else if (typeof about_highlights === 'string') {
+      if (about_highlights.trim().startsWith('[')) {
+        highlightsStr = about_highlights.trim();
+      } else {
+        const lines = about_highlights.split('\n').map(s => s.trim()).filter(Boolean);
+        highlightsStr = JSON.stringify(lines);
+      }
+    }
+    const cleanAvailability = sanitizeString(availability_status || '', 255);
+    const cleanPhilTitle = sanitizeString(code_philosophy_title || 'Clean, Fast & Impactful', 150);
+    const cleanPhilDesc = sanitizeString(code_philosophy_desc || '', 3000);
+    const cleanGpa = sanitizeString(gpa_score || '3.40', 50);
+
+    // SEO sanitization
+    const cleanMetaTitle = sanitizeString(meta_title || `${cleanName} - Software Engineer & Fullstack Developer`, 255);
+    const cleanMetaDesc = sanitizeString(meta_description || cleanBio, 1000);
+    const cleanMetaKeywords = sanitizeString(meta_keywords || '', 1000);
+    const cleanOgImage = sanitizeString(og_image || cleanAvatar || '/foto2.jpg', 500);
+    const cleanCanonical = sanitizeString(canonical_url || '', 500);
+    const cleanGVerify = sanitizeString(google_site_verification || '', 255);
+
     const rolesStr = typeof roles === 'string' ? roles : JSON.stringify(roles || []);
 
     await ensureDatabaseAndTables();
@@ -66,22 +110,40 @@ export async function PUT(request) {
         `UPDATE profile SET 
           name = ?, full_name = ?, tagline = ?, roles = ?, bio = ?, avatar_url = ?, 
           cv_url = ?, github_url = ?, linkedin_url = ?, instagram_url = ?, facebook_url = ?, 
-          email = ?, location = ?
+          email = ?, location = ?,
+          about_title = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?,
+          code_philosophy_title = ?, code_philosophy_desc = ?, gpa_score = ?,
+          meta_title = ?, meta_description = ?, meta_keywords = ?, og_image = ?,
+          canonical_url = ?, google_site_verification = ?
          WHERE id = ?`,
         [
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
           cleanCv, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
-          cleanEmail, cleanLocation, existing[0].id
+          cleanEmail, cleanLocation,
+          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
+          cleanPhilTitle, cleanPhilDesc, cleanGpa,
+          cleanMetaTitle, cleanMetaDesc, cleanMetaKeywords, cleanOgImage,
+          cleanCanonical, cleanGVerify, existing[0].id
         ]
       );
     } else {
       await query(
-        `INSERT INTO profile (name, full_name, tagline, roles, bio, avatar_url, cv_url, github_url, linkedin_url, instagram_url, facebook_url, email, location)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO profile (
+          name, full_name, tagline, roles, bio, avatar_url, cv_url, github_url,
+          linkedin_url, instagram_url, facebook_url, email, location,
+          about_title, about_bio_2, about_highlights, availability_status,
+          code_philosophy_title, code_philosophy_desc, gpa_score,
+          meta_title, meta_description, meta_keywords, og_image,
+          canonical_url, google_site_verification
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
           cleanCv, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
-          cleanEmail, cleanLocation
+          cleanEmail, cleanLocation,
+          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
+          cleanPhilTitle, cleanPhilDesc, cleanGpa,
+          cleanMetaTitle, cleanMetaDesc, cleanMetaKeywords, cleanOgImage,
+          cleanCanonical, cleanGVerify
         ]
       );
     }
@@ -101,10 +163,23 @@ export async function PUT(request) {
       instagram_url: cleanInstagram,
       facebook_url: cleanFacebook,
       email: cleanEmail,
-      location: cleanLocation
+      location: cleanLocation,
+      about_title: cleanAboutTitle,
+      about_bio_2: cleanAboutBio2,
+      about_highlights: highlightsStr,
+      availability_status: cleanAvailability,
+      code_philosophy_title: cleanPhilTitle,
+      code_philosophy_desc: cleanPhilDesc,
+      gpa_score: cleanGpa,
+      meta_title: cleanMetaTitle,
+      meta_description: cleanMetaDesc,
+      meta_keywords: cleanMetaKeywords,
+      og_image: cleanOgImage,
+      canonical_url: cleanCanonical,
+      google_site_verification: cleanGVerify
     };
 
-    return NextResponse.json({ success: true, message: 'Profil berhasil diperbarui di database' });
+    return NextResponse.json({ success: true, message: 'Data profil & SEO berhasil disimpan ke database' });
   } catch (err) {
     console.error('Error updating profile:', err);
     return NextResponse.json({ success: false, error: 'Gagal memperbarui profil' }, { status: 500 });
