@@ -532,20 +532,9 @@ export default function AdminPage() {
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <div className="font-heading font-bold text-base text-white flex items-center gap-2">
-              <span>Admin Panel</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/30">
-                MySQL CRUD
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] text-gray-400">
-              <span className="flex items-center gap-1">
-                <span className={`w-2 h-2 rounded-full ${dbStatus.connected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                {dbStatus.connected ? 'MySQL Terhubung' : 'Fallback Mode'}
-              </span>
-              <span>•</span>
-              <span>DB: portofolio_iqbal</span>
-            </div>
+            <h1 className="font-heading font-bold text-base text-white">
+              Admin Panel
+            </h1>
           </div>
         </div>
 
