@@ -103,9 +103,37 @@ export default function About({ profile, projectCount, certCount, expCount }) {
               <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 {profile?.location || 'Surabaya, Jawa Timur, Indonesia'}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {profile?.availability_status || 'Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun Freelance di bidang Software Engineering.'}
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
+                {profile?.availability_status || 'Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun On-site di Jakarta, Surabaya, Bandung, Tangerang, Yogyakarta, Semarang, Sidoarjo, Malang, dan Banyuwangi.'}
               </p>
+
+              {/* Badges Kota Pilihan */}
+              <div className="pt-3 border-t border-purple-200 dark:border-purple-900/30">
+                <div className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                  Siap Bekerja & Relokasi di:
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Jakarta',
+                    'Surabaya',
+                    'Bandung',
+                    'Tangerang',
+                    'Yogyakarta',
+                    'Semarang',
+                    'Sidoarjo',
+                    'Malang',
+                    'Banyuwangi',
+                    'Remote (WFH)'
+                  ].map((city, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30"
+                    >
+                      {city}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="glass-card p-6 rounded-2xl border border-sky-200 dark:border-cyan-500/20">
