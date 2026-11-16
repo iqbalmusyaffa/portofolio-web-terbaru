@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, Sparkles, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, Sparkles, MessageSquare } from 'lucide-react';
 
 export default function Contact({ profile }) {
   const [formData, setFormData] = useState({
@@ -130,20 +130,10 @@ export default function Contact({ profile }) {
                 <div>
                   <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status Respon</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Tersimpan Aman di MySQL
+                    Biasanya merespon dalam 24 jam
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="glass-card p-6 rounded-3xl border border-purple-200 dark:border-purple-500/20 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/20">
-              <div className="flex items-center gap-2 text-purple-700 dark:text-[#a78bfa] mb-2 font-bold text-sm">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span>Keamanan Form & Database</span>
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                Formulir kontak ini dilengkapi perlindungan anti-XSS, rate limiting anti-spam, parameterized query (SQL Injection prevention), dan honeypot bot trap.
-              </p>
             </div>
           </div>
 
