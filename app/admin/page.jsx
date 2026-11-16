@@ -27,8 +27,13 @@ import {
   X,
   Search,
   Sparkles,
-  Globe
+  Globe,
+  Upload,
+  Image as ImageIcon,
+  Loader2,
+  Code
 } from 'lucide-react';
+import { iconMap, isImageIcon } from '@/components/Skills';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -57,6 +62,39 @@ export default function AdminPage() {
   // Security Credentials states
   const [credForm, setCredForm] = useState({ username: '', newPassword: '', confirmPassword: '' });
   const [credLoading, setCredLoading] = useState(false);
+
+  // File Upload state & handler
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const handleUploadFile = async (e, onUploaded, folder = 'uploads') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', folder);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Gagal mengunggah file');
+      }
+
+      onUploaded(data.url);
+      showToast('File gambar berhasil diunggah ke assets!');
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast(err.message || 'Upload gagal', 'error');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
 
   // Ensure Admin page always stays in high-contrast dark theme
   useEffect(() => {
@@ -715,32 +753,45 @@ export default function AdminPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {skills.map((s) => (
-                <div key={s.id} className="bg-[#0b081e] p-4 rounded-2xl border border-purple-500/20 flex items-center justify-between group shadow-lg">
-                  <div>
-                    <span className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider">{s.category}</span>
-                    <h4 className="font-bold text-white text-sm">{s.name}</h4>
-                    <span className="text-xs text-gray-400">{s.level}</span>
+              {skills.map((s) => {
+                const hasImg = isImageIcon(s.icon);
+                const IconComp = iconMap[s.icon] || Code;
+                return (
+                  <div key={s.id} className="bg-[#0b081e] p-4 rounded-2xl border border-purple-500/20 flex items-center justify-between group shadow-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
+                        {hasImg ? (
+                          <img src={s.icon} alt={s.name} className="w-5 h-5 object-contain" />
+                        ) : (
+                          <IconComp className="w-5 h-5 text-purple-400" />
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider">{s.category}</span>
+                        <h4 className="font-bold text-white text-sm">{s.name}</h4>
+                        <span className="text-xs text-gray-400">{s.level}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                      <button
+                        onClick={() => {
+                          setEditingItem({ ...s });
+                          setModalType('skill');
+                        }}
+                        className="p-1.5 rounded text-purple-300 hover:bg-white/10 cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSkill(s.id)}
+                        className="p-1.5 rounded text-rose-400 hover:bg-white/10 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                    <button
-                      onClick={() => {
-                        setEditingItem({ ...s });
-                        setModalType('skill');
-                      }}
-                      className="p-1.5 rounded text-purple-300 hover:bg-white/10 cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => deleteSkill(s.id)}
-                      className="p-1.5 rounded text-rose-400 hover:bg-white/10 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -1009,7 +1060,19 @@ export default function AdminPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Foto Avatar URL</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-semibold text-gray-200">Foto Avatar URL</label>
+                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                        <Upload className="w-3 h-3" />
+                        <span>Upload (JPG/PNG)</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          className="hidden"
+                          onChange={(e) => handleUploadFile(e, (url) => setProfile({ ...profile, avatar_url: url }))}
+                        />
+                      </label>
+                    </div>
                     <input
                       type="text"
                       value={profile.avatar_url || ''}
@@ -1310,9 +1373,21 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">
-                    Gambar Thumbnail Sosial (OpenGraph Image URL)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-gray-200">
+                      Gambar Thumbnail Sosial (OpenGraph Image URL)
+                    </label>
+                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <span>Upload Banner (JPG/PNG)</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={(e) => handleUploadFile(e, (url) => setProfile({ ...profile, og_image: url }))}
+                      />
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={profile.og_image || ''}
@@ -1541,13 +1616,30 @@ export default function AdminPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-300 mb-1">URL Gambar Preview</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-gray-300">URL Gambar Preview</label>
+                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <span>Upload Foto (JPG/PNG)</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, image_url: url }))}
+                      />
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={editingItem.image_url || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, image_url: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                   />
+                  {editingItem.image_url && (
+                    <div className="mt-2 h-20 rounded-xl overflow-hidden border border-purple-500/20 bg-black/40 flex items-center justify-center">
+                      <img src={editingItem.image_url} alt="Preview" className="h-full object-cover" />
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -1645,6 +1737,99 @@ export default function AdminPage() {
                     <option value="Intermediate">Intermediate</option>
                     <option value="Beginner">Beginner</option>
                   </select>
+                </div>
+
+                {/* ICON & IMAGE UPLOAD CUSTOMIZER */}
+                <div>
+                  <label className="block text-xs text-gray-300 mb-1">Icon / Logo Gambar</label>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
+                      {editingItem.icon && isImageIcon(editingItem.icon) ? (
+                        <img src={editingItem.icon} alt="preview" className="w-7 h-7 object-contain" />
+                      ) : (
+                        (() => {
+                          const PreIcon = iconMap[editingItem.icon] || Code;
+                          return <PreIcon className="w-6 h-6 text-purple-400" />;
+                        })()
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={editingItem.icon || 'Code'}
+                        onChange={(e) => setEditingItem({ ...editingItem, icon: e.target.value })}
+                        placeholder="Nama icon (cth: Code, Zap) atau path gambar /assets/..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Upload File Mandiri (JPG, PNG, SVG) */}
+                  <div className="p-3 rounded-xl bg-[#120e2e] border border-purple-500/20 mb-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-purple-300">Upload Mandiri Logo/Gambar (JPG, PNG, SVG):</span>
+                      {uploadingImage && <span className="text-[10px] text-purple-400 animate-pulse">Mengunggah ke assets...</span>}
+                    </div>
+                    <label className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-purple-400/40 hover:border-purple-400 hover:bg-purple-950/40 text-purple-200 text-xs font-medium cursor-pointer transition-all">
+                      <Upload className="w-4 h-4 text-purple-400" />
+                      <span>Pilih File Gambar dari Komputer (JPG/PNG/SVG)</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                        className="hidden"
+                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, icon: url }), 'skills')}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Pilihan Cepat Icon Bawaan Sesuai Mockup */}
+                  <div>
+                    <span className="block text-[11px] text-gray-400 mb-1.5">Atau pilih icon standar bawaan:</span>
+                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-[#120e2e] rounded-xl border border-purple-500/20">
+                      {[
+                        { name: 'Code', label: 'HTML (<>)' },
+                        { name: 'Palette', label: 'CSS' },
+                        { name: 'FileCode', label: 'SASS' },
+                        { name: 'Zap', label: 'JavaScript' },
+                        { name: 'Atom', label: 'React JS' },
+                        { name: 'Globe', label: 'Next JS' },
+                        { name: 'Wind', label: 'Tailwind CSS' },
+                        { name: 'Layout', label: 'Bootstrap' },
+                        { name: 'Server', label: 'Node JS' },
+                        { name: 'Cpu', label: 'Express JS' },
+                        { name: 'Database', label: 'MySQL' },
+                        { name: 'HardDrive', label: 'SQLite' },
+                        { name: 'Layers', label: 'Laravel' },
+                        { name: 'Flame', label: 'Firebase' },
+                        { name: 'FileCode2', label: 'PHP' },
+                        { name: 'Terminal', label: 'Python' },
+                        { name: 'GitBranch', label: 'Git' },
+                        { name: 'Github', label: 'GitHub' },
+                        { name: 'Laptop', label: 'VS Code' },
+                        { name: 'Send', label: 'Postman' },
+                        { name: 'Triangle', label: 'Vercel' },
+                        { name: 'Figma', label: 'Figma' }
+                      ].map((ic) => {
+                        const IconComp = iconMap[ic.name] || Code;
+                        const isSelected = editingItem.icon === ic.name;
+                        return (
+                          <button
+                            type="button"
+                            key={ic.name}
+                            onClick={() => setEditingItem({ ...editingItem, icon: ic.name })}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-purple-600 text-white font-semibold shadow-md'
+                                : 'bg-white/5 hover:bg-white/10 text-gray-300'
+                            }`}
+                          >
+                            <IconComp className="w-3.5 h-3.5" />
+                            <span>{ic.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
                 <div className="pt-3 flex justify-end gap-2">
                   <button
@@ -1856,7 +2041,19 @@ export default function AdminPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-300 mb-1">URL Kredensial / PDF Sertifikat</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-gray-300">URL Kredensial / PDF Sertifikat</label>
+                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <span>Upload (PDF/JPG/PNG)</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,application/pdf"
+                        className="hidden"
+                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, credential_url: url }))}
+                      />
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={editingItem.credential_url || ''}

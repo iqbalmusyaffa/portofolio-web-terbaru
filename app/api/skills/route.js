@@ -30,7 +30,7 @@ export async function POST(request) {
 
     const cleanCategory = sanitizeString(category, 50);
     const cleanName = sanitizeString(name, 100);
-    const cleanIcon = sanitizeString(icon, 50);
+    const cleanIcon = sanitizeString(icon, 500);
     const cleanLevel = sanitizeString(level, 50);
 
     await ensureDatabaseAndTables();
@@ -64,7 +64,7 @@ export async function PUT(request) {
 
     const cleanCategory = sanitizeString(category, 50);
     const cleanName = sanitizeString(name, 100);
-    const cleanIcon = sanitizeString(icon, 50);
+    const cleanIcon = sanitizeString(icon, 500);
     const cleanLevel = sanitizeString(level, 50);
 
     await ensureDatabaseAndTables();

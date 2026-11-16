@@ -22,10 +22,14 @@ import {
   Laptop,
   Send,
   Triangle,
-  Figma
+  Figma,
+  Box,
+  Braces,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 
-const iconMap = {
+export const iconMap = {
   Code,
   Palette,
   FileCode,
@@ -47,8 +51,65 @@ const iconMap = {
   Laptop,
   Send,
   Triangle,
-  Figma
+  Figma,
+  Box,
+  Braces,
+  Sparkles
 };
+
+// Pemetaan nama teknologi ke icon Lucide bawaan
+export const defaultSkillIconMap = {
+  'html': Code,
+  'css': Palette,
+  'sass': FileCode,
+  'scss': FileCode,
+  'javascript': Zap,
+  'js': Zap,
+  'react': Atom,
+  'react js': Atom,
+  'react.js': Atom,
+  'reactjs': Atom,
+  'next': Globe,
+  'next js': Globe,
+  'next.js': Globe,
+  'nextjs': Globe,
+  'tailwind': Wind,
+  'tailwind css': Wind,
+  'bootstrap': Layout,
+  'node': Server,
+  'node js': Server,
+  'node.js': Server,
+  'nodejs': Server,
+  'express': Cpu,
+  'express js': Cpu,
+  'express.js': Cpu,
+  'expressjs': Cpu,
+  'mysql': Database,
+  'sqlite': HardDrive,
+  'laravel': Layers,
+  'firebase': Flame,
+  'php': FileCode2,
+  'python': Terminal,
+  'git': GitBranch,
+  'github': Github,
+  'vs code': Laptop,
+  'vscode': Laptop,
+  'visual studio code': Laptop,
+  'postman': Send,
+  'vercel': Triangle,
+  'figma': Figma
+};
+
+export function isImageIcon(val) {
+  if (!val || typeof val !== 'string') return false;
+  return (
+    val.startsWith('http://') ||
+    val.startsWith('https://') ||
+    val.startsWith('/') ||
+    val.startsWith('data:image/') ||
+    /\.(png|jpe?g|svg|webp|gif|ico)(\?.*)?$/i.test(val)
+  );
+}
 
 export default function Skills({ skills }) {
   const categories = ['Frontend', 'Backend', 'Languages', 'Tools'];
@@ -74,47 +135,60 @@ export default function Skills({ skills }) {
           </p>
         </div>
 
-        {/* Skills Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Skills Cards Grid - Sesuai mockup 4 kolom */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {categories.map((cat) => {
             const list = groupedSkills[cat] || [];
             
             return (
               <div
                 key={cat}
-                className="glass-panel p-6 rounded-3xl border border-gray-200 dark:border-white/10 hover:border-purple-400 dark:hover:border-purple-500/40 transition-all duration-300 shadow-md dark:shadow-lg dark:shadow-black/40 flex flex-col"
+                className="bg-[#0b081e] p-6 rounded-3xl border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 shadow-xl flex flex-col justify-between"
               >
-                {/* Category Header */}
-                <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-200 dark:border-white/10">
-                  <h3 className="text-lg font-bold font-heading text-gray-900 dark:text-white flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-                    {cat}
-                  </h3>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 font-semibold">
-                    {list.length} item
-                  </span>
-                </div>
+                <div>
+                  {/* Category Header */}
+                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-purple-500/20">
+                    <h3 className="text-lg font-bold font-heading text-white flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#d946ef] shrink-0" />
+                      <span>{cat}</span>
+                    </h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#1b1444] text-purple-300 border border-purple-500/30 font-semibold">
+                      {list.length} item
+                    </span>
+                  </div>
 
-                {/* Skills badges */}
-                <div className="flex flex-wrap gap-2.5">
-                  {list.map((skill) => {
-                    const IconComponent = iconMap[skill.icon] || Code;
-                    return (
-                      <div
-                        key={skill.id || skill.name}
-                        className="group flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-gray-200 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-400/50 transition-all duration-200 cursor-default"
-                        title={`${skill.name} - ${skill.level || 'Advanced'}`}
-                      >
-                        <IconComponent className="w-4 h-4 text-purple-600 dark:text-[#a78bfa] group-hover:text-purple-800 dark:group-hover:text-[#e879f9] group-hover:scale-110 transition-transform" />
-                        <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-purple-900 dark:group-hover:text-white">
-                          {skill.name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {list.length === 0 && (
-                    <p className="text-xs text-gray-500 italic py-2">Belum ada skill ditambahkan</p>
-                  )}
+                  {/* Skills badges */}
+                  <div className="flex flex-wrap gap-2.5">
+                    {list.map((skill) => {
+                      const hasImage = isImageIcon(skill.icon);
+                      const normName = (skill.name || '').toLowerCase().trim();
+                      const IconComponent = iconMap[skill.icon] || defaultSkillIconMap[normName] || Code;
+
+                      return (
+                        <div
+                          key={skill.id || skill.name}
+                          className="group flex items-center gap-2 px-3 py-2 rounded-xl bg-[#140f33] hover:bg-[#20174e] border border-purple-500/20 hover:border-purple-400/50 transition-all duration-200 cursor-default shadow-sm"
+                          title={`${skill.name} - ${skill.level || 'Advanced'}`}
+                        >
+                          {hasImage ? (
+                            <img
+                              src={skill.icon}
+                              alt={skill.name}
+                              className="w-4 h-4 object-contain group-hover:scale-110 transition-transform shrink-0"
+                            />
+                          ) : (
+                            <IconComponent className="w-4 h-4 text-purple-400 group-hover:text-[#e879f9] group-hover:scale-110 transition-transform shrink-0" />
+                          )}
+                          <span className="text-xs font-semibold text-gray-200 group-hover:text-white">
+                            {skill.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {list.length === 0 && (
+                      <p className="text-xs text-gray-400 italic py-2">Belum ada skill ditambahkan</p>
+                    )}
+                  </div>
                 </div>
               </div>
             );
