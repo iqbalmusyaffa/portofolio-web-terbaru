@@ -10,7 +10,10 @@ import {
   initialCertificates
 } from '@/lib/initialData';
 
-export async function GET() {
+export async function GET(request) {
+  const auth = requireAdminAuth(request);
+  if (!auth.authenticated) return NextResponse.json(auth.response, { status: 401 });
+
   try {
     await ensureDatabaseAndTables();
     const status = getDbStatus();
