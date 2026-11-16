@@ -3,9 +3,12 @@ import {
   createSecureSessionToken,
   verifySecureSessionToken,
   verifyPassword,
+  hashPassword,
   checkRateLimit,
-  getClientIp
+  getClientIp,
+  requireAdminAuth
 } from '@/lib/security';
+import { query, ensureDatabaseAndTables } from '@/lib/db';
 
 export async function POST(request) {
   try {
@@ -25,39 +28,53 @@ export async function POST(request) {
 
     const { username, password } = await request.json();
 
-    const expectedUser = process.env.ADMIN_USERNAME;
-    const expectedPass = process.env.ADMIN_PASSWORD;
-
-    if (!expectedUser || !expectedPass) {
-      console.error('[AUTH SECURITY ERROR] ADMIN_USERNAME atau ADMIN_PASSWORD belum diatur di file .env');
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Autentikasi admin belum dikonfigurasi di server. Harap tentukan ADMIN_USERNAME dan ADMIN_PASSWORD di environment server.'
-        },
-        { status: 500 }
-      );
-    }
-
     // 2. Validate inputs
-    if (!username || !password) {
+    if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
       return NextResponse.json(
         { success: false, error: 'Username dan password wajib diisi' },
         { status: 400 }
       );
     }
 
-    // 3. Timing-safe verification
-    const isUserValid = typeof username === 'string' && username.trim() === expectedUser.trim();
-    const isPassValid = verifyPassword(password, expectedPass);
+    const cleanUsername = username.trim();
 
-    if (isUserValid && isPassValid) {
-      // Generate cryptographic JWE token with 24 hours expiration
-      const token = createSecureSessionToken(expectedUser, 24);
+    await ensureDatabaseAndTables();
+
+    // 3. Check credentials against MySQL database (admins table)
+    let authenticatedUser = null;
+    let isPasswordCorrect = false;
+
+    try {
+      const rows = await query('SELECT * FROM admins WHERE username = ? LIMIT 1', [cleanUsername]);
+      if (rows && rows.length > 0) {
+        const adminRecord = rows[0];
+        isPasswordCorrect = verifyPassword(password, adminRecord.password_hash);
+        if (isPasswordCorrect) {
+          authenticatedUser = adminRecord.username;
+        }
+      }
+    } catch (dbErr) {
+      console.warn('[AUTH] Database check failed, trying environment fallback:', dbErr.message);
+    }
+
+    // Fallback to process.env if environment variables are set (optional backward compatibility)
+    if (!authenticatedUser && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD) {
+      const isUserMatch = cleanUsername === process.env.ADMIN_USERNAME.trim();
+      const isPassMatch = verifyPassword(password, process.env.ADMIN_PASSWORD);
+      if (isUserMatch && isPassMatch) {
+        authenticatedUser = process.env.ADMIN_USERNAME.trim();
+        isPasswordCorrect = true;
+      }
+    }
+
+    // 4. If credentials valid, issue encrypted JWE session cookie
+    if (authenticatedUser && isPasswordCorrect) {
+      const token = createSecureSessionToken(authenticatedUser, 24);
 
       const response = NextResponse.json({
         success: true,
-        message: 'Login berhasil'
+        message: 'Login berhasil',
+        user: authenticatedUser
       });
 
       // Secure HTTP-Only Cookie with Strict SameSite
@@ -80,6 +97,7 @@ export async function POST(request) {
       { status: 401 }
     );
   } catch (err) {
+    console.error('[AUTH ERROR]', err);
     return NextResponse.json({ success: false, error: 'Terjadi kesalahan sistem' }, { status: 500 });
   }
 }
@@ -93,13 +111,66 @@ export async function GET(request) {
   }
 
   const payload = verifySecureSessionToken(token);
-  const activeAdmin = process.env.ADMIN_USERNAME;
-  const isValid = !!payload && (!activeAdmin || payload.user === activeAdmin);
-
   return NextResponse.json({
-    isAuthenticated: isValid,
-    user: isValid ? payload.user : null
+    isAuthenticated: !!payload,
+    user: payload ? payload.user : null
   });
+}
+
+export async function PUT(request) {
+  // Change password / update credentials endpoint
+  const auth = requireAdminAuth(request);
+  if (!auth.authenticated) return NextResponse.json(auth.response, { status: 401 });
+
+  try {
+    const { new_username, new_password } = await request.json();
+    if (!new_password || typeof new_password !== 'string' || new_password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: 'Password baru minimal harus 6 karakter' },
+        { status: 400 }
+      );
+    }
+
+    const targetUser = new_username && typeof new_username === 'string' ? new_username.trim() : auth.user;
+    const passwordHash = hashPassword(new_password);
+
+    await ensureDatabaseAndTables();
+
+    // Check if user exists
+    const existing = await query('SELECT id FROM admins WHERE username = ?', [auth.user]);
+    if (existing && existing.length > 0) {
+      await query('UPDATE admins SET username = ?, password_hash = ? WHERE username = ?', [
+        targetUser,
+        passwordHash,
+        auth.user
+      ]);
+    } else {
+      await query('INSERT INTO admins (username, password_hash) VALUES (?, ?)', [
+        targetUser,
+        passwordHash
+      ]);
+    }
+
+    // Refresh token with new username
+    const newToken = createSecureSessionToken(targetUser, 24);
+    const response = NextResponse.json({
+      success: true,
+      message: 'Kredensial admin berhasil diperbarui'
+    });
+
+    response.cookies.set('admin_auth', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24
+    });
+
+    return response;
+  } catch (err) {
+    console.error('[UPDATE ADMIN ERROR]', err);
+    return NextResponse.json({ success: false, error: 'Gagal memperbarui kredensial' }, { status: 500 });
+  }
 }
 
 export async function DELETE() {

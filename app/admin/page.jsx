@@ -53,6 +53,10 @@ export default function AdminPage() {
   const [modalType, setModalType] = useState(null);
   const [toast, setToast] = useState({ message: '', type: '' });
 
+  // Security Credentials states
+  const [credForm, setCredForm] = useState({ username: '', newPassword: '', confirmPassword: '' });
+  const [credLoading, setCredLoading] = useState(false);
+
   // Ensure Admin page always stays in high-contrast dark theme
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -99,6 +103,40 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await fetch('/api/auth/login', { method: 'DELETE' });
     setIsAuthenticated(false);
+  };
+
+  const handleUpdateCredentials = async (e) => {
+    e.preventDefault();
+    if (credForm.newPassword !== credForm.confirmPassword) {
+      showToast('Konfirmasi password tidak cocok', 'error');
+      return;
+    }
+    if (credForm.newPassword.length < 6) {
+      showToast('Password baru minimal 6 karakter', 'error');
+      return;
+    }
+    setCredLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          new_username: credForm.username ? credForm.username.trim() : undefined,
+          new_password: credForm.newPassword
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Username & password admin berhasil diperbarui di database!', 'success');
+        setCredForm({ username: '', newPassword: '', confirmPassword: '' });
+      } else {
+        showToast(data.error || 'Gagal memperbarui kredensial', 'error');
+      }
+    } catch (err) {
+      showToast('Terjadi kesalahan jaringan', 'error');
+    } finally {
+      setCredLoading(false);
+    }
   };
 
   const showToast = (message, type = 'success') => {
@@ -552,6 +590,7 @@ export default function AdminPage() {
             { id: 'certificates', label: 'Sertifikasi', icon: Award, count: certificates.length },
             { id: 'profile', label: 'Biodata & Sosial', icon: User },
             { id: 'messages', label: 'Pesan Masuk', icon: MessageSquare, count: messages.filter(m => !m.is_read).length, isBadge: true },
+            { id: 'security', label: 'Keamanan Akun', icon: Shield },
           ].map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -1097,6 +1136,81 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ==================== TAB 8: SECURITY (CHANGE CREDENTIALS) ==================== */}
+        {activeTab === 'security' && (
+          <div className="space-y-6 animate-fadeIn max-w-2xl">
+            <div>
+              <h2 className="text-xl font-bold font-heading text-white">Keamanan Akun & Kredensial</h2>
+              <p className="text-xs text-gray-400">
+                Ubah username dan password akun admin. Password disimpan dalam format hash kriptografis PBKDF2-SHA512 di database MySQL (tidak pernah disimpan dalam bentuk teks biasa).
+              </p>
+            </div>
+
+            <div className="bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/30 space-y-6 shadow-xl">
+              <div className="flex items-start gap-3 p-4 rounded-2xl bg-purple-950/40 border border-purple-500/30">
+                <Shield className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-purple-200 leading-relaxed">
+                  <strong className="text-white block mb-0.5">Penyimpanan Aman (Database-Level)</strong>
+                  Kredensial login dikelola langsung di tabel MySQL <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300">admins</code> dan dienkripsi penuh menggunakan salt acak. File <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300">.env</code> Anda kini bersih tanpa ada username atau password plaintext.
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdateCredentials} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Username Baru (Opsional, kosongkan jika tidak ingin mengubah username)
+                  </label>
+                  <input
+                    type="text"
+                    value={credForm.username}
+                    onChange={(e) => setCredForm({ ...credForm, username: e.target.value })}
+                    placeholder="Contoh: iqbal"
+                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Password Baru (Minimal 6 karakter) *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={credForm.newPassword}
+                    onChange={(e) => setCredForm({ ...credForm, newPassword: e.target.value })}
+                    placeholder="Masukkan password baru Anda"
+                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Ulangi Password Baru *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={credForm.confirmPassword}
+                    onChange={(e) => setCredForm({ ...credForm, confirmPassword: e.target.value })}
+                    placeholder="Ulangi password baru Anda"
+                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={credLoading}
+                    className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {credLoading ? 'Menyimpan...' : 'Perbarui Kredensial Admin'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
