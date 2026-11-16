@@ -25,7 +25,7 @@ Portofolio web modern dan interaktif untuk **Iqbal Musyaffa** (Software Engineer
 
 ### ⚡ 2. Admin CRUD Dashboard (`/admin`)
 Panel khusus untuk mengelola seluruh konten website secara dinamis:
-- **Autentikasi Aman**: Login berbasis sesi/cookie (Default: `admin` / `admin123`).
+- **Autentikasi Aman**: Login berbasis sesi terenkripsi AES-256-GCM (JWE) & Cookie HTTP-Only.
 - **Indikator Status MySQL**: Menampilkan status koneksi database secara real-time.
 - **Proyek CRUD**: Tambah proyek baru, edit, hapus, dan atur *Featured Project*.
 - **Skills CRUD**: Tambah skill baru, tentukan kategori (Frontend, Backend, Languages, Tools) dan tingkat keahlian.
@@ -37,9 +37,9 @@ Panel khusus untuk mengelola seluruh konten website secara dinamis:
 
 ---
 
-## 🛠️ Konfigurasi Database (MySQL)
+## 🛠️ Konfigurasi Environment (`.env`)
 
-Aplikasi telah dikonfigurasi dan diuji langsung dengan **MySQL (Laragon)**:
+Duplikasi file `.env.example` menjadi `.env` dan atur kredensial rahasia Anda sendiri:
 
 ```env
 DB_HOST=localhost
@@ -48,11 +48,15 @@ DB_USER=root
 DB_PASSWORD=
 DB_NAME=portofolio_iqbal
 
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
+# Atur Username & Password Admin Anda sendiri
+ADMIN_USERNAME=username_pilihan_anda
+ADMIN_PASSWORD=password_rahasia_anda
+
+# Kunci Enkripsi Token JWT (AES-256-GCM)
+JWT_SECRET=kunci_rahasia_enkripsi_minimal_32_karakter
 ```
 
-> **Catatan**: Jika database belum dibuat, script inisialisasi otomatis membuat database `portofolio_iqbal` dan seluruh tabel relasionalnya serta mengisi data awal (seeding).
+> **Catatan Keamanan**: File `.env` bersifat privat dan tidak akan pernah ter-push ke GitHub karena sudah terdaftar di `.gitignore`.
 
 ---
 
@@ -71,8 +75,7 @@ Buka browser di `http://localhost:3000`.
 
 ### 3. Akses Admin CRUD Panel
 Buka `http://localhost:3000/admin`
-- **Username**: `admin`
-- **Password**: `admin123`
+Gunakan kredensial `ADMIN_USERNAME` dan `ADMIN_PASSWORD` yang telah Anda tentukan di file `.env` Anda.
 
 ### 4. Build untuk Production
 ```bash

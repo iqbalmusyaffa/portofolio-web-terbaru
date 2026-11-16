@@ -429,7 +429,7 @@ export default function AdminPage() {
                 required
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                placeholder="admin"
+                placeholder="Masukkan username admin"
                 className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 focus:bg-[#1a1344] transition-all"
               />
             </div>
@@ -443,14 +443,9 @@ export default function AdminPage() {
                 required
                 value={loginForm.password}
                 onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                placeholder="admin123"
+                placeholder="••••••••••••"
                 className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 focus:bg-[#1a1344] transition-all"
               />
-            </div>
-
-            <div className="text-[11px] text-gray-300 bg-[#140f33] p-3 rounded-xl border border-purple-500/20">
-              <span>Default credentials: </span>
-              <strong className="text-purple-300">admin</strong> / <strong className="text-purple-300">admin123</strong>
             </div>
 
             <button

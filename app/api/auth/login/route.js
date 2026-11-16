@@ -25,8 +25,19 @@ export async function POST(request) {
 
     const { username, password } = await request.json();
 
-    const expectedUser = process.env.ADMIN_USERNAME || 'admin';
-    const expectedPass = process.env.ADMIN_PASSWORD || 'admin123';
+    const expectedUser = process.env.ADMIN_USERNAME;
+    const expectedPass = process.env.ADMIN_PASSWORD;
+
+    if (!expectedUser || !expectedPass) {
+      console.error('[AUTH SECURITY ERROR] ADMIN_USERNAME atau ADMIN_PASSWORD belum diatur di file .env');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Autentikasi admin belum dikonfigurasi di server. Harap tentukan ADMIN_USERNAME dan ADMIN_PASSWORD di environment server.'
+        },
+        { status: 500 }
+      );
+    }
 
     // 2. Validate inputs
     if (!username || !password) {
@@ -37,23 +48,23 @@ export async function POST(request) {
     }
 
     // 3. Timing-safe verification
-    const isUserValid = username === expectedUser;
+    const isUserValid = typeof username === 'string' && username.trim() === expectedUser.trim();
     const isPassValid = verifyPassword(password, expectedPass);
 
     if (isUserValid && isPassValid) {
-      // Generate cryptographic HMAC token with 24 hours expiration
-      const token = createSecureSessionToken(username, 24);
+      // Generate cryptographic JWE token with 24 hours expiration
+      const token = createSecureSessionToken(expectedUser, 24);
 
       const response = NextResponse.json({
         success: true,
         message: 'Login berhasil'
       });
 
-      // Secure HTTP-Only Cookie
+      // Secure HTTP-Only Cookie with Strict SameSite
       response.cookies.set('admin_auth', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'strict',
         path: '/',
         maxAge: 60 * 60 * 24 // 24 hours
       });
@@ -82,9 +93,12 @@ export async function GET(request) {
   }
 
   const payload = verifySecureSessionToken(token);
+  const activeAdmin = process.env.ADMIN_USERNAME;
+  const isValid = !!payload && (!activeAdmin || payload.user === activeAdmin);
+
   return NextResponse.json({
-    isAuthenticated: !!payload,
-    user: payload ? payload.user : null
+    isAuthenticated: isValid,
+    user: isValid ? payload.user : null
   });
 }
 
