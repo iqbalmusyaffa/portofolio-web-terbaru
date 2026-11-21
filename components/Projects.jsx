@@ -1,11 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ExternalLink, Github, Sparkles, Info, X } from 'lucide-react';
 
 export default function Projects({ projects }) {
   const [activeFilter, setActiveFilter] = useState('Semua');
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // Clean UX: Tutup modal dengan ESC & kunci body scroll
+  useEffect(() => {
+    if (!selectedProject) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedProject(null);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedProject]);
 
   const filters = ['Semua', 'Fullstack', 'Frontend', 'Backend'];
 
@@ -187,16 +204,23 @@ export default function Projects({ projects }) {
 
       {/* Project Details Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-          <div className="glass-panel max-w-xl w-full rounded-3xl border border-purple-300 dark:border-purple-500/40 p-6 sm:p-8 relative shadow-2xl bg-white dark:bg-[#0c0822]">
+        <div
+          onClick={() => setSelectedProject(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fadeIn"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel max-w-xl w-full rounded-2xl sm:rounded-3xl border border-purple-300 dark:border-purple-500/40 p-5 sm:p-7 relative shadow-2xl bg-white dark:bg-[#0c0822] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-purple-900/40"
+          >
             <button
               onClick={() => setSelectedProject(null)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
+              className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-all cursor-pointer"
+              aria-label="Tutup"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="h-52 rounded-2xl overflow-hidden mb-5 bg-gray-100 dark:bg-[#0c0822]">
+            <div className="h-48 sm:h-56 rounded-2xl overflow-hidden mb-5 bg-gray-100 dark:bg-[#0c0822]">
               <img
                 src={selectedProject.image_url}
                 alt={selectedProject.title}
@@ -204,7 +228,7 @@ export default function Projects({ projects }) {
               />
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-bold font-heading text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold font-heading text-gray-900 dark:text-white mb-2 pr-8">
               {selectedProject.title}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
@@ -217,7 +241,7 @@ export default function Projects({ projects }) {
                   href={selectedProject.live_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#9333ea] shadow-md shadow-purple-900/30"
+                  className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#9333ea] shadow-md shadow-purple-900/30 hover:scale-[1.01] active:scale-[0.99] transition-all"
                 >
                   <span>Buka Aplikasi</span>
                   <ExternalLink className="w-4 h-4" />
@@ -228,7 +252,7 @@ export default function Projects({ projects }) {
                   href={selectedProject.github_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10"
+                  className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 hover:scale-[1.01] active:scale-[0.99] transition-all"
                 >
                   <Github className="w-4 h-4" />
                   <span>GitHub Repository</span>
