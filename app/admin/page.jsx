@@ -1510,14 +1510,6 @@ export default function AdminPage() {
             </div>
 
             <div className="bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/30 space-y-6 shadow-xl">
-              <div className="flex items-start gap-3 p-4 rounded-2xl bg-purple-950/40 border border-purple-500/30">
-                <Shield className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
-                <div className="text-xs text-purple-200 leading-relaxed">
-                  <strong className="text-white block mb-0.5">Penyimpanan Aman (Database-Level)</strong>
-                  Kredensial login dikelola langsung di tabel MySQL <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300">admins</code> dan dienkripsi penuh menggunakan salt acak. File <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300">.env</code> Anda kini bersih tanpa ada username atau password plaintext.
-                </div>
-              </div>
-
               <form onSubmit={handleUpdateCredentials} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1.5">
