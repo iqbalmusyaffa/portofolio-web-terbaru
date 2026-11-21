@@ -1702,121 +1702,147 @@ export default function AdminPage() {
 
       {/* ===================== EDIT / ADD MODAL ===================== */}
       {modalType && editingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-[#0e0a29] max-w-lg w-full rounded-3xl border border-purple-500/40 p-6 sm:p-7 relative max-h-[90vh] overflow-y-auto text-white shadow-2xl">
-            <button
-              onClick={() => {
-                setModalType(null);
-                setEditingItem(null);
-              }}
-              className="absolute top-5 right-5 p-1.5 rounded-full bg-white/10 text-gray-300 hover:text-white cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <h3 className="text-lg font-bold font-heading text-white mb-4">
-              {editingItem.id ? 'Edit' : 'Tambah'} {modalType.toUpperCase()}
-            </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#0e0a29] max-w-lg sm:max-w-xl w-full rounded-2xl sm:rounded-3xl border border-purple-500/40 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] text-white overflow-hidden relative">
+            {/* Persistent Modal Header */}
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-purple-900/40 bg-[#110c30] shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-purple-900/60 border border-purple-500/40 flex items-center justify-center text-purple-300">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold font-heading text-white">
+                    {editingItem.id ? 'Edit' : 'Tambah'} {
+                      modalType === 'project' ? 'Proyek' :
+                      modalType === 'skill' ? 'Skill' :
+                      modalType === 'experience' ? 'Pengalaman' :
+                      modalType === 'education' ? 'Pendidikan' :
+                      modalType === 'certificate' ? 'Sertifikasi' : modalType.toUpperCase()
+                    }
+                  </h3>
+                  <p className="text-[11px] text-gray-400">
+                    {editingItem.id ? 'Perbarui data yang sudah tersimpan' : 'Tambahkan item baru ke portfolio'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setModalType(null);
+                  setEditingItem(null);
+                }}
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
+                aria-label="Tutup modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* PROJECT FORM */}
             {modalType === 'project' && (
-              <form onSubmit={saveProject} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Judul Proyek</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.title || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Deskripsi</label>
-                  <textarea
-                    rows={3}
-                    value={editingItem.description || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-gray-300">URL Gambar Preview</label>
-                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                      <Upload className="w-3 h-3" />
-                      <span>Upload Foto (JPG/PNG)</span>
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp"
-                        className="hidden"
-                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, image_url: url }))}
-                      />
-                    </label>
+              <form onSubmit={saveProject} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Judul Proyek</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingItem.title || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={editingItem.image_url || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, image_url: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                  {editingItem.image_url && (
-                    <div className="mt-2 h-20 rounded-xl overflow-hidden border border-purple-500/20 bg-black/40 flex items-center justify-center">
-                      <img src={editingItem.image_url} alt="Preview" className="h-full object-cover" />
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Deskripsi</label>
+                    <textarea
+                      rows={3}
+                      value={editingItem.description || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs text-gray-300">URL Gambar Preview</label>
+                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                        <Upload className="w-3 h-3" />
+                        <span>Upload Foto (JPG/PNG)</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          className="hidden"
+                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, image_url: url }))}
+                        />
+                      </label>
                     </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Live URL Demo</label>
                     <input
                       type="text"
-                      value={editingItem.live_url || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, live_url: e.target.value })}
+                      value={editingItem.image_url || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, image_url: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                    {editingItem.image_url && (
+                      <div className="mt-2 h-24 rounded-xl overflow-hidden border border-purple-500/20 bg-black/40 flex items-center justify-center">
+                        <img src={editingItem.image_url} alt="Preview" className="h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Live URL Demo</label>
+                      <input
+                        type="text"
+                        value={editingItem.live_url || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, live_url: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">GitHub Repo URL</label>
+                      <input
+                        type="text"
+                        value={editingItem.github_url || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, github_url: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Tags (pisahkan dengan koma)</label>
+                    <input
+                      type="text"
+                      value={typeof editingItem.tags === 'string' ? editingItem.tags : JSON.stringify(editingItem.tags || [])}
+                      onChange={(e) => setEditingItem({ ...editingItem, tags: e.target.value })}
+                      placeholder="Next.js, Tailwind, MySQL"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">GitHub Repo URL</label>
+                  <div className="flex items-center gap-2 pt-1">
                     <input
-                      type="text"
-                      value={editingItem.github_url || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, github_url: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      type="checkbox"
+                      id="feat"
+                      checked={!!editingItem.featured}
+                      onChange={(e) => setEditingItem({ ...editingItem, featured: e.target.checked ? 1 : 0 })}
+                      className="rounded text-purple-600 focus:ring-purple-500"
                     />
+                    <label htmlFor="feat" className="text-xs text-gray-300 cursor-pointer">Tampilkan sebagai Featured Project</label>
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Tags (pisahkan dengan koma)</label>
-                  <input
-                    type="text"
-                    value={typeof editingItem.tags === 'string' ? editingItem.tags : JSON.stringify(editingItem.tags || [])}
-                    onChange={(e) => setEditingItem({ ...editingItem, tags: e.target.value })}
-                    placeholder="Next.js, Tailwind, MySQL"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div className="flex items-center gap-2 pt-2">
-                  <input
-                    type="checkbox"
-                    id="feat"
-                    checked={!!editingItem.featured}
-                    onChange={(e) => setEditingItem({ ...editingItem, featured: e.target.checked ? 1 : 0 })}
-                    className="rounded text-purple-600 focus:ring-purple-500"
-                  />
-                  <label htmlFor="feat" className="text-xs text-gray-300">Tampilkan sebagai Featured Project</label>
-                </div>
-                <div className="pt-3 flex justify-end gap-2">
+
+                {/* Persistent Footer */}
+                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 rounded-xl text-xs text-gray-300 bg-white/5 hover:bg-white/10 cursor-pointer"
+                    onClick={() => {
+                      setModalType(null);
+                      setEditingItem(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
                   >
                     Simpan Proyek
                   </button>
@@ -1826,147 +1852,157 @@ export default function AdminPage() {
 
             {/* SKILL FORM */}
             {modalType === 'skill' && (
-              <form onSubmit={saveSkill} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Kategori</label>
-                  <select
-                    value={editingItem.category || 'Frontend'}
-                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  >
-                    <option value="Frontend">Frontend</option>
-                    <option value="Backend">Backend</option>
-                    <option value="Languages">Languages</option>
-                    <option value="Tools">Tools</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Nama Skill</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.name || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                    placeholder="Contoh: Next.js"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Tingkat Kemahiran</label>
-                  <select
-                    value={editingItem.level || 'Advanced'}
-                    onChange={(e) => setEditingItem({ ...editingItem, level: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  >
-                    <option value="Advanced">Advanced</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Beginner">Beginner</option>
-                  </select>
-                </div>
-
-                {/* ICON & IMAGE UPLOAD CUSTOMIZER */}
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Icon / Logo Gambar</label>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
-                      {editingItem.icon && isImageIcon(editingItem.icon) ? (
-                        <img src={editingItem.icon} alt="preview" className="w-7 h-7 object-contain" />
-                      ) : (
-                        (() => {
-                          const PreIcon = iconMap[editingItem.icon] || Code;
-                          return <PreIcon className="w-6 h-6 text-purple-400" />;
-                        })()
-                      )}
+              <form onSubmit={saveSkill} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Kategori</label>
+                      <select
+                        value={editingItem.category || 'Frontend'}
+                        onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      >
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Languages">Languages</option>
+                        <option value="Tools">Tools</option>
+                      </select>
                     </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={editingItem.icon || 'Code'}
-                        onChange={(e) => setEditingItem({ ...editingItem, icon: e.target.value })}
-                        placeholder="Nama icon (cth: Code, Zap) atau path gambar /assets/..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 font-mono"
-                      />
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Tingkat Kemahiran</label>
+                      <select
+                        value={editingItem.level || 'Advanced'}
+                        onChange={(e) => setEditingItem({ ...editingItem, level: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      >
+                        <option value="Advanced">Advanced</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Beginner">Beginner</option>
+                      </select>
                     </div>
                   </div>
 
-                  {/* Upload File Mandiri (JPG, PNG, SVG) */}
-                  <div className="p-3 rounded-xl bg-[#120e2e] border border-purple-500/20 mb-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-purple-300">Upload Mandiri Logo/Gambar (JPG, PNG, SVG):</span>
-                      {uploadingImage && <span className="text-[10px] text-purple-400 animate-pulse">Mengunggah ke assets...</span>}
-                    </div>
-                    <label className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-purple-400/40 hover:border-purple-400 hover:bg-purple-950/40 text-purple-200 text-xs font-medium cursor-pointer transition-all">
-                      <Upload className="w-4 h-4 text-purple-400" />
-                      <span>Pilih File Gambar dari Komputer (JPG/PNG/SVG)</span>
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                        className="hidden"
-                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, icon: url }), 'skills')}
-                      />
-                    </label>
-                  </div>
-
-                  {/* Pilihan Cepat Icon Bawaan Sesuai Mockup */}
                   <div>
-                    <span className="block text-[11px] text-gray-400 mb-1.5">Atau pilih icon standar bawaan:</span>
-                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-[#120e2e] rounded-xl border border-purple-500/20">
-                      {[
-                        { name: 'Code', label: 'HTML (<>)' },
-                        { name: 'Palette', label: 'CSS' },
-                        { name: 'FileCode', label: 'SASS' },
-                        { name: 'Zap', label: 'JavaScript' },
-                        { name: 'Atom', label: 'React JS' },
-                        { name: 'Globe', label: 'Next JS' },
-                        { name: 'Wind', label: 'Tailwind CSS' },
-                        { name: 'Layout', label: 'Bootstrap' },
-                        { name: 'Server', label: 'Node JS' },
-                        { name: 'Cpu', label: 'Express JS' },
-                        { name: 'Database', label: 'MySQL' },
-                        { name: 'HardDrive', label: 'SQLite' },
-                        { name: 'Layers', label: 'Laravel' },
-                        { name: 'Flame', label: 'Firebase' },
-                        { name: 'FileCode2', label: 'PHP' },
-                        { name: 'Terminal', label: 'Python' },
-                        { name: 'GitBranch', label: 'Git' },
-                        { name: 'Github', label: 'GitHub' },
-                        { name: 'Laptop', label: 'VS Code' },
-                        { name: 'Send', label: 'Postman' },
-                        { name: 'Triangle', label: 'Vercel' },
-                        { name: 'Figma', label: 'Figma' }
-                      ].map((ic) => {
-                        const IconComp = iconMap[ic.name] || Code;
-                        const isSelected = editingItem.icon === ic.name;
-                        return (
-                          <button
-                            type="button"
-                            key={ic.name}
-                            onClick={() => setEditingItem({ ...editingItem, icon: ic.name })}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-purple-600 text-white font-semibold shadow-md'
-                                : 'bg-white/5 hover:bg-white/10 text-gray-300'
-                            }`}
-                          >
-                            <IconComp className="w-3.5 h-3.5" />
-                            <span>{ic.label}</span>
-                          </button>
-                        );
-                      })}
+                    <label className="block text-xs text-gray-300 mb-1">Nama Skill</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingItem.name || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                      placeholder="Contoh: Next.js"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+
+                  {/* ICON & IMAGE UPLOAD CUSTOMIZER */}
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Icon / Logo Gambar</label>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-12 h-12 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
+                        {editingItem.icon && isImageIcon(editingItem.icon) ? (
+                          <img src={editingItem.icon} alt="preview" className="w-7 h-7 object-contain" />
+                        ) : (
+                          (() => {
+                            const PreIcon = iconMap[editingItem.icon] || Code;
+                            return <PreIcon className="w-6 h-6 text-purple-400" />;
+                          })()
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={editingItem.icon || 'Code'}
+                          onChange={(e) => setEditingItem({ ...editingItem, icon: e.target.value })}
+                          placeholder="Nama icon (cth: Code, Zap) atau path gambar /assets/..."
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Upload File Mandiri (JPG, PNG, SVG) */}
+                    <div className="p-3 rounded-xl bg-[#120e2e] border border-purple-500/20 mb-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-purple-300">Upload Mandiri Logo/Gambar (JPG, PNG, SVG):</span>
+                        {uploadingImage && <span className="text-[10px] text-purple-400 animate-pulse">Mengunggah ke assets...</span>}
+                      </div>
+                      <label className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-purple-400/40 hover:border-purple-400 hover:bg-purple-950/40 text-purple-200 text-xs font-medium cursor-pointer transition-all">
+                        <Upload className="w-4 h-4 text-purple-400" />
+                        <span>Pilih File Gambar dari Komputer (JPG/PNG/SVG)</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                          className="hidden"
+                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, icon: url }), 'skills')}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Pilihan Cepat Icon Bawaan */}
+                    <div>
+                      <span className="block text-[11px] text-gray-400 mb-1.5">Atau pilih icon standar bawaan:</span>
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-[#120e2e] rounded-xl border border-purple-500/20 scrollbar-thin scrollbar-thumb-purple-900/40">
+                        {[
+                          { name: 'Code', label: 'HTML (<>)' },
+                          { name: 'Palette', label: 'CSS' },
+                          { name: 'FileCode', label: 'SASS' },
+                          { name: 'Zap', label: 'JavaScript' },
+                          { name: 'Atom', label: 'React JS' },
+                          { name: 'Globe', label: 'Next JS' },
+                          { name: 'Wind', label: 'Tailwind CSS' },
+                          { name: 'Layout', label: 'Bootstrap' },
+                          { name: 'Server', label: 'Node JS' },
+                          { name: 'Cpu', label: 'Express JS' },
+                          { name: 'Database', label: 'MySQL' },
+                          { name: 'HardDrive', label: 'SQLite' },
+                          { name: 'Layers', label: 'Laravel' },
+                          { name: 'Flame', label: 'Firebase' },
+                          { name: 'FileCode2', label: 'PHP' },
+                          { name: 'Terminal', label: 'Python' },
+                          { name: 'GitBranch', label: 'Git' },
+                          { name: 'Github', label: 'GitHub' },
+                          { name: 'Laptop', label: 'VS Code' },
+                          { name: 'Send', label: 'Postman' },
+                          { name: 'Triangle', label: 'Vercel' },
+                          { name: 'Figma', label: 'Figma' }
+                        ].map((ic) => {
+                          const IconComp = iconMap[ic.name] || Code;
+                          const isSelected = editingItem.icon === ic.name;
+                          return (
+                            <button
+                              type="button"
+                              key={ic.name}
+                              onClick={() => setEditingItem({ ...editingItem, icon: ic.name })}
+                              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-purple-600 text-white font-semibold shadow-md'
+                                  : 'bg-white/5 hover:bg-white/10 text-gray-300'
+                              }`}
+                            >
+                              <IconComp className="w-3.5 h-3.5" />
+                              <span>{ic.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="pt-3 flex justify-end gap-2">
+
+                {/* Persistent Footer */}
+                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 rounded-xl text-xs text-gray-300 bg-white/5 hover:bg-white/10 cursor-pointer"
+                    onClick={() => {
+                      setModalType(null);
+                      setEditingItem(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
                   >
                     Simpan Skill
                   </button>
@@ -1976,80 +2012,87 @@ export default function AdminPage() {
 
             {/* EXPERIENCE FORM */}
             {modalType === 'experience' && (
-              <form onSubmit={saveExperience} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Role / Posisi</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.role || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, role: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Perusahaan / Organisasi</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.company || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, company: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={saveExperience} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Periode</label>
+                    <label className="block text-xs text-gray-300 mb-1">Role / Posisi</label>
                     <input
                       type="text"
                       required
-                      value={editingItem.period || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
-                      placeholder="Juni 2024 - November 2024"
+                      value={editingItem.role || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, role: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Lokasi</label>
+                    <label className="block text-xs text-gray-300 mb-1">Perusahaan / Organisasi</label>
                     <input
                       type="text"
-                      value={editingItem.location || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, location: e.target.value })}
-                      placeholder="Surabaya, Indonesia"
+                      required
+                      value={editingItem.company || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, company: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Periode</label>
+                      <input
+                        type="text"
+                        required
+                        value={editingItem.period || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
+                        placeholder="Juni 2024 - November 2024"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Lokasi</label>
+                      <input
+                        type="text"
+                        value={editingItem.location || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, location: e.target.value })}
+                        placeholder="Surabaya, Indonesia"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Deskripsi Tugas & Hasil</label>
+                    <textarea
+                      rows={4}
+                      value={editingItem.description || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Teknologi yang Digunakan (koma)</label>
+                    <input
+                      type="text"
+                      value={typeof editingItem.technologies === 'string' ? editingItem.technologies : JSON.stringify(editingItem.technologies || [])}
+                      onChange={(e) => setEditingItem({ ...editingItem, technologies: e.target.value })}
+                      placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Deskripsi Tugas & Hasil</label>
-                  <textarea
-                    rows={4}
-                    value={editingItem.description || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Teknologi yang Digunakan (koma)</label>
-                  <input
-                    type="text"
-                    value={typeof editingItem.technologies === 'string' ? editingItem.technologies : JSON.stringify(editingItem.technologies || [])}
-                    onChange={(e) => setEditingItem({ ...editingItem, technologies: e.target.value })}
-                    placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div className="pt-3 flex justify-end gap-2">
+
+                {/* Persistent Footer */}
+                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 rounded-xl text-xs text-gray-300 bg-white/5 hover:bg-white/10 cursor-pointer"
+                    onClick={() => {
+                      setModalType(null);
+                      setEditingItem(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
                   >
                     Simpan Pengalaman
                   </button>
@@ -2059,71 +2102,78 @@ export default function AdminPage() {
 
             {/* EDUCATION FORM */}
             {modalType === 'education' && (
-              <form onSubmit={saveEducation} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Institusi / Sekolah</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.school || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, school: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Jurusan / Jenjang</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.degree || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, degree: e.target.value })}
-                    placeholder="Sarjana S1 Sistem Informasi"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={saveEducation} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Tahun Periode</label>
+                    <label className="block text-xs text-gray-300 mb-1">Institusi / Sekolah</label>
                     <input
                       type="text"
                       required
-                      value={editingItem.period || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
-                      placeholder="2021 - 2025"
+                      value={editingItem.school || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, school: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Nilai / IPK</label>
+                    <label className="block text-xs text-gray-300 mb-1">Jurusan / Jenjang</label>
                     <input
                       type="text"
-                      value={editingItem.grade || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, grade: e.target.value })}
-                      placeholder="IPK: 3.4 / 4.0"
+                      required
+                      value={editingItem.degree || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, degree: e.target.value })}
+                      placeholder="Sarjana S1 Sistem Informasi"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Tahun Periode</label>
+                      <input
+                        type="text"
+                        required
+                        value={editingItem.period || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
+                        placeholder="2021 - 2025"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1">Nilai / IPK</label>
+                      <input
+                        type="text"
+                        value={editingItem.grade || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, grade: e.target.value })}
+                        placeholder="IPK: 3.4 / 4.0"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Deskripsi & Kegiatan</label>
+                    <textarea
+                      rows={3}
+                      value={editingItem.description || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Deskripsi & Kegiatan</label>
-                  <textarea
-                    rows={3}
-                    value={editingItem.description || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div className="pt-3 flex justify-end gap-2">
+
+                {/* Persistent Footer */}
+                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 rounded-xl text-xs text-gray-300 bg-white/5 hover:bg-white/10 cursor-pointer"
+                    onClick={() => {
+                      setModalType(null);
+                      setEditingItem(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
                   >
                     Simpan Pendidikan
                   </button>
@@ -2133,70 +2183,77 @@ export default function AdminPage() {
 
             {/* CERTIFICATE FORM */}
             {modalType === 'certificate' && (
-              <form onSubmit={saveCertificate} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Nama Sertifikat</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.title || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Penerbit (Issuer)</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingItem.issuer || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, issuer: e.target.value })}
-                    placeholder="Dicoding Indonesia"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-300 mb-1">Tanggal Terbit</label>
-                  <input
-                    type="text"
-                    value={editingItem.issue_date || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, issue_date: e.target.value })}
-                    placeholder="25 April 2025"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-gray-300">URL Kredensial / PDF Sertifikat</label>
-                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                      <Upload className="w-3 h-3" />
-                      <span>Upload (PDF/JPG/PNG)</span>
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,application/pdf"
-                        className="hidden"
-                        onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, credential_url: url }))}
-                      />
-                    </label>
+              <form onSubmit={saveCertificate} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Nama Sertifikat</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingItem.title || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={editingItem.credential_url || ''}
-                    onChange={(e) => setEditingItem({ ...editingItem, credential_url: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Penerbit (Issuer)</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingItem.issuer || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, issuer: e.target.value })}
+                      placeholder="Dicoding Indonesia"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1">Tanggal Terbit</label>
+                    <input
+                      type="text"
+                      value={editingItem.issue_date || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, issue_date: e.target.value })}
+                      placeholder="25 April 2025"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs text-gray-300">URL Kredensial / PDF Sertifikat</label>
+                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                        <Upload className="w-3 h-3" />
+                        <span>Upload (PDF/JPG/PNG)</span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,application/pdf"
+                          className="hidden"
+                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, credential_url: url }))}
+                        />
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      value={editingItem.credential_url || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, credential_url: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+                    />
+                  </div>
                 </div>
-                <div className="pt-3 flex justify-end gap-2">
+
+                {/* Persistent Footer */}
+                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 rounded-xl text-xs text-gray-300 bg-white/5 hover:bg-white/10 cursor-pointer"
+                    onClick={() => {
+                      setModalType(null);
+                      setEditingItem(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
                   >
                     Simpan Sertifikat
                   </button>
