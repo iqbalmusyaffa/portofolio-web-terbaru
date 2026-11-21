@@ -4,38 +4,33 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Shield,
-  FolderGit2,
-  Zap,
-  Briefcase,
-  GraduationCap,
-  Award,
-  MessageSquare,
-  User,
-  Plus,
-  Trash2,
-  Edit2,
-  ExternalLink,
-  Save,
   CheckCircle,
   AlertTriangle,
-  RotateCcw,
-  LogOut,
-  ArrowLeft,
-  Eye,
-  Database,
-  Check,
-  X,
-  Search,
-  Sparkles,
-  Globe,
-  Upload,
-  Image as ImageIcon,
-  Loader2,
-  Code,
-  Menu,
-  ChevronRight
+  ArrowLeft
 } from 'lucide-react';
-import { iconMap, isImageIcon } from '@/components/Skills';
+
+// Modular Admin Components
+import Sidebar from '@/components/admin/Sidebar';
+import AdminHeader from '@/components/admin/AdminHeader';
+import Modal from '@/components/admin/Modal';
+
+// Form Components
+import ProjectForm from '@/components/admin/forms/ProjectForm';
+import SkillForm from '@/components/admin/forms/SkillForm';
+import ExperienceForm from '@/components/admin/forms/ExperienceForm';
+import EducationForm from '@/components/admin/forms/EducationForm';
+import CertificateForm from '@/components/admin/forms/CertificateForm';
+
+// Tab Components
+import ProjectsTab from '@/components/admin/tabs/ProjectsTab';
+import SkillsTab from '@/components/admin/tabs/SkillsTab';
+import ExperienceTab from '@/components/admin/tabs/ExperienceTab';
+import EducationTab from '@/components/admin/tabs/EducationTab';
+import CertificatesTab from '@/components/admin/tabs/CertificatesTab';
+import ProfileTab from '@/components/admin/tabs/ProfileTab';
+import SeoTab from '@/components/admin/tabs/SeoTab';
+import MessagesTab from '@/components/admin/tabs/MessagesTab';
+import SecurityTab from '@/components/admin/tabs/SecurityTab';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -68,6 +63,7 @@ export default function AdminPage() {
 
   // File Upload state & handler
   const [uploadingImage, setUploadingImage] = useState(false);
+
   const handleUploadFile = async (e, onUploaded, folder = 'uploads') => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -99,7 +95,13 @@ export default function AdminPage() {
     }
   };
 
-  // Ensure Admin page always stays in high-contrast dark theme
+  // Toast Notification Helper
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: '' }), 3500);
+  };
+
+  // Ensure high-contrast dark theme & check authentication on load
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.documentElement.classList.remove('light');
@@ -147,56 +149,17 @@ export default function AdminPage() {
     setIsAuthenticated(false);
   };
 
-  const handleUpdateCredentials = async (e) => {
-    e.preventDefault();
-    if (credForm.newPassword !== credForm.confirmPassword) {
-      showToast('Konfirmasi password tidak cocok', 'error');
-      return;
-    }
-    if (credForm.newPassword.length < 6) {
-      showToast('Password baru minimal 6 karakter', 'error');
-      return;
-    }
-    setCredLoading(true);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          new_username: credForm.username ? credForm.username.trim() : undefined,
-          new_password: credForm.newPassword
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Username & password admin berhasil diperbarui di database!', 'success');
-        setCredForm({ username: '', newPassword: '', confirmPassword: '' });
-      } else {
-        showToast(data.error || 'Gagal memperbarui kredensial', 'error');
-      }
-    } catch (err) {
-      showToast('Terjadi kesalahan jaringan', 'error');
-    } finally {
-      setCredLoading(false);
-    }
-  };
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast({ message: '', type: '' }), 3500);
-  };
-
   const loadAllData = async () => {
     try {
       const [pRes, prRes, sRes, eRes, edRes, cRes, mRes, dbRes] = await Promise.all([
-        fetch('/api/profile').then(r => r.json()),
-        fetch('/api/projects').then(r => r.json()),
-        fetch('/api/skills').then(r => r.json()),
-        fetch('/api/experiences').then(r => r.json()),
-        fetch('/api/educations').then(r => r.json()),
-        fetch('/api/certificates').then(r => r.json()),
-        fetch('/api/messages').then(r => r.json()),
-        fetch('/api/db/init').then(r => r.json())
+        fetch('/api/profile').then((r) => r.json()),
+        fetch('/api/projects').then((r) => r.json()),
+        fetch('/api/skills').then((r) => r.json()),
+        fetch('/api/experiences').then((r) => r.json()),
+        fetch('/api/educations').then((r) => r.json()),
+        fetch('/api/certificates').then((r) => r.json()),
+        fetch('/api/messages').then((r) => r.json()),
+        fetch('/api/db/init').then((r) => r.json())
       ]);
 
       if (pRes?.data) setProfile(pRes.data);
@@ -230,7 +193,7 @@ export default function AdminPage() {
     }
   };
 
-  // ===================== CRUD HANDLERS =====================
+  // ===================== CRUD OPERATIONS =====================
 
   // Project CRUD
   const saveProject = async (e) => {
@@ -286,6 +249,8 @@ export default function AdminPage() {
         setModalType(null);
         setEditingItem(null);
         loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menyimpan', 'error');
       }
     } catch (e) {
       showToast('Gagal menyimpan skill', 'error');
@@ -322,6 +287,8 @@ export default function AdminPage() {
         setModalType(null);
         setEditingItem(null);
         loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menyimpan', 'error');
       }
     } catch (e) {
       showToast('Gagal menyimpan pengalaman', 'error');
@@ -358,6 +325,8 @@ export default function AdminPage() {
         setModalType(null);
         setEditingItem(null);
         loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menyimpan', 'error');
       }
     } catch (e) {
       showToast('Gagal menyimpan pendidikan', 'error');
@@ -394,6 +363,8 @@ export default function AdminPage() {
         setModalType(null);
         setEditingItem(null);
         loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menyimpan', 'error');
       }
     } catch (e) {
       showToast('Gagal menyimpan sertifikat', 'error');
@@ -459,6 +430,54 @@ export default function AdminPage() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  // Security Credentials Update
+  const handleUpdateCredentials = async (e) => {
+    e.preventDefault();
+    if (credForm.newPassword !== credForm.confirmPassword) {
+      showToast('Konfirmasi password tidak cocok', 'error');
+      return;
+    }
+    if (credForm.newPassword.length < 6) {
+      showToast('Password baru minimal 6 karakter', 'error');
+      return;
+    }
+    setCredLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          new_username: credForm.username ? credForm.username.trim() : undefined,
+          new_password: credForm.newPassword
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Username & password admin berhasil diperbarui di database!', 'success');
+        setCredForm({ username: '', newPassword: '', confirmPassword: '' });
+      } else {
+        showToast(data.error || 'Gagal memperbarui kredensial', 'error');
+      }
+    } catch (err) {
+      showToast('Terjadi kesalahan jaringan', 'error');
+    } finally {
+      setCredLoading(false);
+    }
+  };
+
+  // Label mapping for current tab breadcrumb
+  const tabLabels = {
+    projects: 'Proyek',
+    skills: 'Skills',
+    experience: 'Pengalaman',
+    education: 'Pendidikan',
+    certificates: 'Sertifikasi',
+    profile: 'Biodata & About Me',
+    seo: 'Pengaturan SEO',
+    messages: 'Pesan Masuk',
+    security: 'Keamanan Akun'
   };
 
   // ===================== LOADING SCREEN =====================
@@ -550,36 +569,6 @@ export default function AdminPage() {
     );
   }
 
-  // ===================== NAVIGATION GROUPS =====================
-  const navGroups = [
-    {
-      group: 'KONTEN UTAMA',
-      items: [
-        { id: 'projects', label: 'Proyek', icon: FolderGit2, count: projects.length },
-        { id: 'skills', label: 'Skills', icon: Zap, count: skills.length },
-        { id: 'experience', label: 'Pengalaman', icon: Briefcase, count: experiences.length },
-        { id: 'education', label: 'Pendidikan', icon: GraduationCap, count: educations.length },
-        { id: 'certificates', label: 'Sertifikasi', icon: Award, count: certificates.length },
-      ],
-    },
-    {
-      group: 'PROFIL & TAMPILAN',
-      items: [
-        { id: 'profile', label: 'Biodata & About Me', icon: User },
-        { id: 'seo', label: 'Pengaturan SEO', icon: Globe },
-      ],
-    },
-    {
-      group: 'ADMIN & SISTEM',
-      items: [
-        { id: 'messages', label: 'Pesan Masuk', icon: MessageSquare, count: messages.filter(m => !m.is_read).length, isBadge: true },
-        { id: 'security', label: 'Keamanan Akun', icon: Shield },
-      ],
-    },
-  ];
-
-  const currentTabInfo = navGroups.flatMap(g => g.items).find(i => i.id === activeTab);
-
   // ===================== ADMIN DASHBOARD =====================
   return (
     <div className="min-h-screen bg-[#030014] text-white flex flex-col lg:flex-row font-sans">
@@ -597,1672 +586,267 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Mobile Top Bar (Visible only on mobile/tablet) */}
-      <div className="lg:hidden border-b border-purple-900/30 bg-[#070518]/95 backdrop-blur-xl px-4 py-3 sticky top-0 z-40 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-900/40">
-            <Shield className="w-4 h-4" />
-          </div>
-          <div>
-            <h1 className="font-heading font-bold text-sm text-white leading-tight">Admin Panel</h1>
-            <p className="text-[10px] text-purple-300/70">Portfolio Iqbal</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            target="_blank"
-            className="p-2 rounded-xl bg-white/5 border border-white/10 text-cyan-400 hover:text-white"
-            title="Lihat Web"
-          >
-            <Eye className="w-4 h-4" />
-          </Link>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-300 hover:text-white transition-all cursor-pointer"
-            aria-label="Toggle menu"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
+      {/* 1. Left Sidebar Navigation */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        counts={{
+          projects: projects.length,
+          skills: skills.length,
+          experiences: experiences.length,
+          educations: educations.length,
+          certificates: certificates.length,
+          unreadMessages: messages.filter((m) => !m.is_read).length
+        }}
+        onSeedReset={handleSeedReset}
+        onLogout={handleLogout}
+      />
 
-      {/* Mobile Backdrop Overlay */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden animate-fadeIn"
-        />
-      )}
-
-      {/* Modern Left Sidebar */}
-      <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-72 bg-[#070417] border-r border-purple-900/30 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {/* Sidebar Header */}
-        <div className="p-5 border-b border-purple-900/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-violet-700 flex items-center justify-center text-white shadow-lg shadow-purple-900/50 border border-purple-400/30">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="font-heading font-bold text-base text-white tracking-wide">
-                  Admin Panel
-                </h1>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[11px] text-emerald-400/90 font-medium">MySQL Active</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Close Button */}
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Sidebar Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-5 scrollbar-thin scrollbar-thumb-purple-900/30">
-          {navGroups.map((group, groupIdx) => (
-            <div key={groupIdx} className="space-y-1">
-              <p className="px-3 text-[10px] font-bold text-purple-400/70 tracking-wider uppercase mb-1.5">
-                {group.group}
-              </p>
-              <div className="space-y-1">
-                {group.items.map((tab) => {
-                  const Icon = tab.icon;
-                  const active = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        setSidebarOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all group cursor-pointer ${
-                        active
-                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold shadow-md shadow-purple-950 border border-purple-400/30'
-                          : 'text-gray-400 hover:text-white hover:bg-purple-950/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                          active ? 'text-white' : 'text-gray-400 group-hover:text-purple-300'
-                        }`} />
-                        <span className="truncate">{tab.label}</span>
-                      </div>
-
-                      {tab.count !== undefined && (
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                            tab.isBadge && tab.count > 0
-                              ? 'bg-rose-500 text-white animate-pulse'
-                              : active
-                              ? 'bg-white/20 text-white'
-                              : 'bg-purple-950/80 text-purple-300 border border-purple-800/40'
-                          }`}
-                        >
-                          {tab.count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Sidebar Footer Actions */}
-        <div className="p-3.5 border-t border-purple-900/30 bg-[#060314]/80 space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <Link
-              href="/"
-              target="_blank"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/30 transition-all text-center"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Lihat Web</span>
-            </Link>
-
-            <button
-              onClick={handleSeedReset}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-purple-300 bg-purple-950/60 hover:bg-purple-900/80 border border-purple-500/40 transition-all cursor-pointer text-center"
-              title="Reset dan isi ulang data awal website"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Data</span>
-            </button>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 transition-all cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Keluar dari Admin</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
+      {/* 2. Main Content Workspace */}
       <main className="flex-1 min-w-0 bg-[#030014] overflow-y-auto">
-        {/* Desktop Sticky Header */}
-        <div className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-purple-900/20 bg-[#070417]/50 backdrop-blur-md sticky top-0 z-20">
-          <div className="flex items-center gap-2.5 text-xs text-gray-400">
-            <span className="text-gray-500 font-medium">Dashboard</span>
-            <ChevronRight className="w-3.5 h-3.5 text-purple-400/60" />
-            <span className="text-purple-300 font-semibold">
-              {currentTabInfo?.label || activeTab}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-950/60 border border-emerald-500/30 text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Database Terhubung
-            </span>
-
-            <Link
-              href="/"
-              target="_blank"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-200 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all"
-            >
-              <Eye className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>Buka Website</span>
-            </Link>
-          </div>
-        </div>
+        {/* Top Header Bar */}
+        <AdminHeader
+          activeTab={activeTab}
+          currentTabLabel={tabLabels[activeTab]}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
 
         {/* Tab Content Container */}
         <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
+          {activeTab === 'projects' && (
+            <ProjectsTab
+              projects={projects}
+              onAdd={() => {
+                setEditingItem({
+                  title: '',
+                  description: '',
+                  live_url: '',
+                  github_url: '',
+                  image_url: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80',
+                  tags: 'Next.js, React, MySQL',
+                  featured: 1
+                });
+                setModalType('project');
+              }}
+              onEdit={(proj) => {
+                setEditingItem({ ...proj });
+                setModalType('project');
+              }}
+              onDelete={deleteProject}
+            />
+          )}
 
-        {/* ==================== TAB 1: PROJECTS ==================== */}
-        {activeTab === 'projects' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold font-heading text-white">Kelola Proyek</h2>
-                <p className="text-xs text-gray-400">Total {projects.length} proyek tersimpan di MySQL</p>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingItem({
-                    title: '',
-                    description: '',
-                    live_url: '',
-                    github_url: '',
-                    image_url: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80',
-                    tags: 'Next.js, React, MySQL',
-                    featured: 1
-                  });
-                  setModalType('project');
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/30 hover:scale-105 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Proyek</span>
-              </button>
-            </div>
+          {activeTab === 'skills' && (
+            <SkillsTab
+              skills={skills}
+              onAdd={() => {
+                setEditingItem({ category: 'Frontend', name: '', icon: 'Code', level: 'Advanced' });
+                setModalType('skill');
+              }}
+              onEdit={(skill) => {
+                setEditingItem({ ...skill });
+                setModalType('skill');
+              }}
+              onDelete={deleteSkill}
+            />
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {projects.map((proj) => (
-                <div key={proj.id} className="bg-[#0b081e] rounded-2xl overflow-hidden border border-purple-500/20 flex flex-col justify-between shadow-xl">
-                  <div className="h-40 relative bg-black/40 overflow-hidden">
-                    <img src={proj.image_url} alt={proj.title} className="w-full h-full object-cover" />
-                    {proj.featured ? (
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950/90 text-purple-200 border border-purple-500/40">
-                        Featured
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-bold text-white text-base mb-1">{proj.title}</h3>
-                      <p className="text-xs text-gray-400 line-clamp-2 mb-3">{proj.description}</p>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-purple-900/20">
-                      <div className="flex items-center gap-2">
-                        {proj.live_url && (
-                          <a href={proj.live_url} target="_blank" className="text-xs text-purple-300 hover:text-white flex items-center gap-1">
-                            <ExternalLink className="w-3 h-3" /> Live
-                          </a>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            setEditingItem({ ...proj });
-                            setModalType('project');
-                          }}
-                          className="p-1.5 rounded-lg text-purple-300 hover:bg-purple-900/40 cursor-pointer"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteProject(proj.id)}
-                          className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950/40 cursor-pointer"
-                          title="Hapus"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          {activeTab === 'experience' && (
+            <ExperienceTab
+              experiences={experiences}
+              onAdd={() => {
+                setEditingItem({
+                  role: '',
+                  company: '',
+                  period: '',
+                  type: 'Work',
+                  description: '',
+                  technologies: 'React, Node.js, MySQL',
+                  location: 'Indonesia'
+                });
+                setModalType('experience');
+              }}
+              onEdit={(exp) => {
+                setEditingItem({ ...exp });
+                setModalType('experience');
+              }}
+              onDelete={deleteExperience}
+            />
+          )}
 
-        {/* ==================== TAB 2: SKILLS ==================== */}
-        {activeTab === 'skills' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold font-heading text-white">Kelola Skills</h2>
-                <p className="text-xs text-gray-400">Total {skills.length} skills tersimpan di MySQL</p>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingItem({ category: 'Frontend', name: '', icon: 'Code', level: 'Advanced' });
-                  setModalType('skill');
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/30 hover:scale-105 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Skill</span>
-              </button>
-            </div>
+          {activeTab === 'education' && (
+            <EducationTab
+              educations={educations}
+              onAdd={() => {
+                setEditingItem({
+                  school: '',
+                  degree: '',
+                  period: '',
+                  grade: '',
+                  location: '',
+                  description: ''
+                });
+                setModalType('education');
+              }}
+              onEdit={(edu) => {
+                setEditingItem({ ...edu });
+                setModalType('education');
+              }}
+              onDelete={deleteEducation}
+            />
+          )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {skills.map((s) => {
-                const hasImg = isImageIcon(s.icon);
-                const IconComp = iconMap[s.icon] || Code;
-                return (
-                  <div key={s.id} className="bg-[#0b081e] p-4 rounded-2xl border border-purple-500/20 flex items-center justify-between group shadow-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
-                        {hasImg ? (
-                          <img src={s.icon} alt={s.name} className="w-5 h-5 object-contain" />
-                        ) : (
-                          <IconComp className="w-5 h-5 text-purple-400" />
-                        )}
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider">{s.category}</span>
-                        <h4 className="font-bold text-white text-sm">{s.name}</h4>
-                        <span className="text-xs text-gray-400">{s.level}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                      <button
-                        onClick={() => {
-                          setEditingItem({ ...s });
-                          setModalType('skill');
-                        }}
-                        className="p-1.5 rounded text-purple-300 hover:bg-white/10 cursor-pointer"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => deleteSkill(s.id)}
-                        className="p-1.5 rounded text-rose-400 hover:bg-white/10 cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+          {activeTab === 'certificates' && (
+            <CertificatesTab
+              certificates={certificates}
+              onAdd={() => {
+                setEditingItem({
+                  title: '',
+                  issuer: '',
+                  issue_date: '',
+                  credential_url: 'https://drive.google.com/drive/folders/1Pot8GeUM6s_4J7n_8VlcULaMaycx1sD4?usp=sharing',
+                  image_url: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
+                });
+                setModalType('certificate');
+              }}
+              onEdit={(cert) => {
+                setEditingItem({ ...cert });
+                setModalType('certificate');
+              }}
+              onDelete={deleteCertificate}
+            />
+          )}
 
-        {/* ==================== TAB 3: EXPERIENCE ==================== */}
-        {activeTab === 'experience' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold font-heading text-white">Kelola Pengalaman</h2>
-                <p className="text-xs text-gray-400">Total {experiences.length} pengalaman kerja / bootcamp</p>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingItem({
-                    role: '',
-                    company: '',
-                    period: '',
-                    type: 'Work',
-                    description: '',
-                    technologies: 'React, Node.js, MySQL',
-                    location: 'Indonesia'
-                  });
-                  setModalType('experience');
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/30 hover:scale-105 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Pengalaman</span>
-              </button>
-            </div>
+          {activeTab === 'profile' && (
+            <ProfileTab
+              profile={profile}
+              setProfile={setProfile}
+              onSave={saveProfile}
+              onUploadFile={handleUploadFile}
+            />
+          )}
 
-            <div className="space-y-4">
-              {experiences.map((exp) => (
-                <div key={exp.id} className="bg-[#0b081e] p-6 rounded-2xl border border-purple-500/20 flex flex-col sm:flex-row items-start justify-between gap-4 shadow-xl">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-bold text-white text-base">{exp.role}</h3>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/30">
-                        {exp.period}
-                      </span>
-                    </div>
-                    <div className="text-xs font-semibold text-gray-300">{exp.company} • {exp.location}</div>
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">{exp.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingItem({ ...exp });
-                        setModalType('experience');
-                      }}
-                      className="p-2 rounded-xl bg-white/5 hover:bg-purple-900/40 text-purple-300 cursor-pointer"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => deleteExperience(exp.id)}
-                      className="p-2 rounded-xl bg-white/5 hover:bg-rose-950/40 text-rose-400 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          {activeTab === 'seo' && (
+            <SeoTab
+              profile={profile}
+              setProfile={setProfile}
+              onSave={saveProfile}
+              onUploadFile={handleUploadFile}
+            />
+          )}
 
-        {/* ==================== TAB 4: EDUCATION ==================== */}
-        {activeTab === 'education' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold font-heading text-white">Kelola Pendidikan</h2>
-                <p className="text-xs text-gray-400">Total {educations.length} riwayat pendidikan</p>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingItem({
-                    school: '',
-                    degree: '',
-                    period: '',
-                    grade: '',
-                    location: '',
-                    description: ''
-                  });
-                  setModalType('education');
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/30 hover:scale-105 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Pendidikan</span>
-              </button>
-            </div>
+          {activeTab === 'messages' && (
+            <MessagesTab
+              messages={messages}
+              onToggleRead={toggleMessageRead}
+              onDelete={deleteMessage}
+            />
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {educations.map((edu) => (
-                <div key={edu.id} className="bg-[#0b081e] p-6 rounded-2xl border border-purple-500/20 flex flex-col justify-between shadow-xl">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/30">
-                        {edu.period}
-                      </span>
-                      {edu.grade && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 font-semibold">
-                          {edu.grade}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-bold text-white text-base">{edu.school}</h3>
-                    <div className="text-xs text-purple-300 font-semibold">{edu.degree}</div>
-                    <p className="text-xs text-gray-300 leading-relaxed">{edu.description}</p>
-                  </div>
-                  <div className="flex items-center justify-end gap-2 pt-4 mt-4 border-t border-purple-900/20">
-                    <button
-                      onClick={() => {
-                        setEditingItem({ ...edu });
-                        setModalType('education');
-                      }}
-                      className="p-1.5 rounded text-purple-300 hover:bg-white/10 cursor-pointer"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => deleteEducation(edu.id)}
-                      className="p-1.5 rounded text-rose-400 hover:bg-white/10 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 5: CERTIFICATES ==================== */}
-        {activeTab === 'certificates' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold font-heading text-white">Kelola Sertifikasi</h2>
-                <p className="text-xs text-gray-400">Total {certificates.length} sertifikat tersimpan di MySQL</p>
-              </div>
-              <button
-                onClick={() => {
-                  setEditingItem({
-                    title: '',
-                    issuer: '',
-                    issue_date: '',
-                    credential_url: 'https://drive.google.com/drive/folders/1Pot8GeUM6s_4J7n_8VlcULaMaycx1sD4?usp=sharing',
-                    image_url: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
-                  });
-                  setModalType('certificate');
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/30 hover:scale-105 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Sertifikat</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {certificates.map((cert) => (
-                <div key={cert.id} className="bg-[#0b081e] p-5 rounded-2xl border border-purple-500/20 flex flex-col justify-between shadow-xl">
-                  <div>
-                    <span className="text-[10px] text-purple-400 font-medium">{cert.issue_date}</span>
-                    <h3 className="font-bold text-white text-sm mb-1 line-clamp-2">{cert.title}</h3>
-                    <p className="text-xs text-gray-400 mb-2">{cert.issuer}</p>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-purple-900/20">
-                    {cert.credential_url ? (
-                      <a href={cert.credential_url} target="_blank" className="text-[11px] text-purple-300 hover:text-white flex items-center gap-1">
-                        <ExternalLink className="w-3 h-3" /> Verifikasi
-                      </a>
-                    ) : <span />}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditingItem({ ...cert });
-                          setModalType('certificate');
-                        }}
-                        className="p-1 rounded text-purple-300 hover:bg-white/10 cursor-pointer"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => deleteCertificate(cert.id)}
-                        className="p-1 rounded text-rose-400 hover:bg-white/10 cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 6: PROFILE & ABOUT ME ==================== */}
-        {activeTab === 'profile' && (
-          <div className="max-w-4xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-8 animate-fadeIn shadow-2xl">
-            <div>
-              <h2 className="text-xl font-bold font-heading text-white">Biodata & Konten About Me</h2>
-              <p className="text-xs text-gray-400">Kelola identitas utama, ringkasan bio, checklist keahlian, dan filosofi kode yang tampil di website</p>
-            </div>
-
-            <form onSubmit={saveProfile} className="space-y-6">
-              {/* Bagian 1: Identitas Utama */}
-              <div className="space-y-4 pt-2">
-                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
-                  1. Identitas Utama & Kontak
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Tampilan</label>
-                    <input
-                      type="text"
-                      value={profile.name || ''}
-                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nama Lengkap & Gelar</label>
-                    <input
-                      type="text"
-                      value={profile.full_name || ''}
-                      onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Tagline</label>
-                    <input
-                      type="text"
-                      value={profile.tagline || ''}
-                      onChange={(e) => setProfile({ ...profile, tagline: e.target.value })}
-                      placeholder="Software Engineer"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Alamat Email</label>
-                    <input
-                      type="email"
-                      value={profile.email || ''}
-                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Lokasi</label>
-                    <input
-                      type="text"
-                      value={profile.location || ''}
-                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-200">Foto Avatar URL</label>
-                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                        <Upload className="w-3 h-3" />
-                        <span>Upload (JPG/PNG)</span>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp"
-                          className="hidden"
-                          onChange={(e) => handleUploadFile(e, (url) => setProfile({ ...profile, avatar_url: url }))}
-                        />
-                      </label>
-                    </div>
-                    <input
-                      type="text"
-                      value={profile.avatar_url || ''}
-                      onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value })}
-                      placeholder="/foto2.jpg"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Link Google Drive CV</label>
-                    <input
-                      type="text"
-                      value={profile.cv_url || ''}
-                      onChange={(e) => setProfile({ ...profile, cv_url: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">File / Link Direct PDF CV</label>
-                    <input
-                      type="text"
-                      value={profile.cv_pdf_url || ''}
-                      onChange={(e) => setProfile({ ...profile, cv_pdf_url: e.target.value })}
-                      placeholder="/cv-iqbal-musyaffa.pdf"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bagian 2: Media Sosial */}
-              <div className="space-y-4 pt-2">
-                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
-                  2. Media Sosial
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">GitHub URL</label>
-                    <input
-                      type="text"
-                      value={profile.github_url || ''}
-                      onChange={(e) => setProfile({ ...profile, github_url: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">LinkedIn URL</label>
-                    <input
-                      type="text"
-                      value={profile.linkedin_url || ''}
-                      onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Instagram URL</label>
-                    <input
-                      type="text"
-                      value={profile.instagram_url || ''}
-                      onChange={(e) => setProfile({ ...profile, instagram_url: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Facebook URL</label>
-                    <input
-                      type="text"
-                      value={profile.facebook_url || ''}
-                      onChange={(e) => setProfile({ ...profile, facebook_url: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bagian 3: Konten Section About Me */}
-              <div className="space-y-4 pt-2">
-                <h3 className="text-sm font-bold text-purple-300 border-b border-purple-900/30 pb-2">
-                  3. Konten Section About Me
-                </h3>
-                
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Utama About</label>
-                  <input
-                    type="text"
-                    value={profile.about_title || ''}
-                    onChange={(e) => setProfile({ ...profile, about_title: e.target.value })}
-                    placeholder="Dedikasi untuk Solusi Digital Berkualitas"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 1 Bio</label>
-                    <textarea
-                      rows={4}
-                      value={profile.bio || ''}
-                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                      placeholder="Saya adalah lulusan S1 Sistem Informasi Universitas Telkom Surabaya..."
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 2 Bio</label>
-                    <textarea
-                      rows={4}
-                      value={profile.about_bio_2 || ''}
-                      onChange={(e) => setProfile({ ...profile, about_bio_2: e.target.value })}
-                      placeholder="Dengan pengalaman dalam ekosistem modern seperti Next.js, React, Node.js..."
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">
-                    Checklist Poin Keahlian / Highlights (Pisahkan dengan baris baru / Enter)
-                  </label>
-                  <textarea
-                    rows={5}
-                    value={
-                      (() => {
-                        if (!profile.about_highlights) return '';
-                        try {
-                          const parsed = typeof profile.about_highlights === 'string'
-                            ? (profile.about_highlights.startsWith('[') ? JSON.parse(profile.about_highlights) : profile.about_highlights)
-                            : profile.about_highlights;
-                          return Array.isArray(parsed) ? parsed.join('\n') : String(profile.about_highlights);
-                        } catch (e) {
-                          return String(profile.about_highlights || '');
-                        }
-                      })()
-                    }
-                    onChange={(e) => setProfile({ ...profile, about_highlights: e.target.value })}
-                    placeholder="Pengembangan web modern end-to-end (Frontend & Backend)&#10;Arsitektur RESTful API performa tinggi & keamanan JWT&#10;Optimasi database relasional MySQL & query efisien"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm font-mono text-xs focus:outline-none focus:border-purple-400"
-                  />
-                  <span className="text-[11px] text-gray-400">Setiap baris akan otomatis menjadi 1 item checklist berikon centang di website.</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Keterangan Lokasi & Ketersediaan</label>
-                    <textarea
-                      rows={2}
-                      value={profile.availability_status || ''}
-                      onChange={(e) => setProfile({ ...profile, availability_status: e.target.value })}
-                      placeholder="Terbuka untuk kesempatan kerja Full-time, Remote, Hybrid, maupun Freelance..."
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Nilai IPK Telkom</label>
-                    <input
-                      type="text"
-                      value={profile.gpa_score || ''}
-                      onChange={(e) => setProfile({ ...profile, gpa_score: e.target.value })}
-                      placeholder="3.40"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Filosofi Kode</label>
-                    <input
-                      type="text"
-                      value={profile.code_philosophy_title || ''}
-                      onChange={(e) => setProfile({ ...profile, code_philosophy_title: e.target.value })}
-                      placeholder="Clean, Fast & Impactful"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-200 mb-1">Deskripsi Filosofi Kode</label>
-                    <textarea
-                      rows={3}
-                      value={profile.code_philosophy_desc || ''}
-                      onChange={(e) => setProfile({ ...profile, code_philosophy_desc: e.target.value })}
-                      placeholder="Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem..."
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-purple-900/30">
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Simpan Perubahan Biodata & About Me</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ==================== TAB 7: SEO & METADATA ==================== */}
-        {activeTab === 'seo' && (
-          <div className="max-w-4xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-8 animate-fadeIn shadow-2xl">
-            <div>
-              <div className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-xl font-bold font-heading text-white">Pengaturan SEO & OpenGraph</h2>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">
-                Atur judul, deskripsi pencarian Google, kata kunci, dan gambar thumbnail sosial media untuk WhatsApp, Facebook, Twitter/X, dan LinkedIn.
-              </p>
-            </div>
-
-            {/* Live Google Search Results Snippet Preview */}
-            <div className="p-5 rounded-2xl bg-[#030014] border border-purple-500/30 space-y-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5" />
-                <span>Pratinjau Hasil Pencarian Google (Live Search Snippet)</span>
-              </div>
-
-              <div className="pt-2">
-                <div className="text-[12px] text-gray-400 font-mono truncate">
-                  {profile.canonical_url || 'https://iqbalmusyaffa.my.id'}
-                </div>
-                <h4 className="text-base sm:text-lg font-semibold text-[#8ab4f8] hover:underline cursor-pointer truncate">
-                  {profile.meta_title || `${profile.name || 'Iqbal Musyaffa'} - Software Engineer & Fullstack Developer`}
-                </h4>
-                <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
-                  {profile.meta_description || profile.bio || 'Portofolio profesional Iqbal Musyaffa - Software Engineer & Fullstack Developer lulusan Telkom University Surabaya.'}
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={saveProfile} className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold text-gray-200 mb-1">
-                  Judul Website (Meta Title) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={profile.meta_title || ''}
-                  onChange={(e) => setProfile({ ...profile, meta_title: e.target.value })}
-                  placeholder="Iqbal Musyaffa - Software Engineer & Fullstack Developer"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                />
-                <span className="text-[11px] text-gray-400">Tampil sebagai judul tab browser dan judul link di Google (Ideal: 50-60 karakter).</span>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-semibold text-gray-200">
-                    Deskripsi Mesin Pencari (Meta Description) *
-                  </label>
-                  <span className="text-[11px] text-purple-300">
-                    {(profile.meta_description || '').length} / 160 karakter
-                  </span>
-                </div>
-                <textarea
-                  rows={3}
-                  required
-                  value={profile.meta_description || ''}
-                  onChange={(e) => setProfile({ ...profile, meta_description: e.target.value })}
-                  placeholder="Portofolio resmi Iqbal Musyaffa - Software Engineer & Fullstack Developer lulusan Telkom University Surabaya..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                />
-                <span className="text-[11px] text-gray-400">Tampil sebagai ringkasan teks di bawah judul pencarian Google dan saat dibagikan ke WhatsApp.</span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-200 mb-1">
-                  Kata Kunci Pencarian (Meta Keywords)
-                </label>
-                <textarea
-                  rows={2}
-                  value={profile.meta_keywords || ''}
-                  onChange={(e) => setProfile({ ...profile, meta_keywords: e.target.value })}
-                  placeholder="Iqbal Musyaffa, Software Engineer, Fullstack Developer, Next.js, React, Laravel, MySQL, Portfolio"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                />
-                <span className="text-[11px] text-gray-400">Pisahkan setiap kata kunci pencarian dengan koma (,).</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-200 mb-1">
-                    URL Domain Resmi (Canonical URL)
-                  </label>
-                  <input
-                    type="text"
-                    value={profile.canonical_url || ''}
-                    onChange={(e) => setProfile({ ...profile, canonical_url: e.target.value })}
-                    placeholder="https://iqbalmusyaffa.my.id/"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                  <span className="text-[11px] text-gray-400">URL utama situs untuk mencegah duplikasi konten SEO.</span>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-gray-200">
-                      Gambar Thumbnail Sosial (OpenGraph Image URL)
-                    </label>
-                    <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                      <Upload className="w-3 h-3" />
-                      <span>Upload Banner (JPG/PNG)</span>
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp"
-                        className="hidden"
-                        onChange={(e) => handleUploadFile(e, (url) => setProfile({ ...profile, og_image: url }))}
-                      />
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    value={profile.og_image || ''}
-                    onChange={(e) => setProfile({ ...profile, og_image: e.target.value })}
-                    placeholder="/foto2.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                  />
-                  <span className="text-[11px] text-gray-400">Gambar kartu pratinjau yang muncul saat link website dikirim di WhatsApp atau sosmed.</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-200 mb-1">
-                  Google Search Console Verification Tag (Opsional)
-                </label>
-                <input
-                  type="text"
-                  value={profile.google_site_verification || ''}
-                  onChange={(e) => setProfile({ ...profile, google_site_verification: e.target.value })}
-                  placeholder="Kode verifikasi Google Search Console (content code)"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-                />
-                <span className="text-[11px] text-gray-400">Masukkan kode verifikasi HTML tag Google untuk memantau performa ranking website Anda.</span>
-              </div>
-
-              <div className="pt-4 border-t border-purple-900/30">
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-cyan-600 via-[#8245ec] to-[#a855f7] shadow-lg shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Simpan Pengaturan SEO & Metadata</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ==================== TAB 7: MESSAGES ==================== */}
-        {activeTab === 'messages' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <h2 className="text-xl font-bold font-heading text-white">Pesan Masuk (Kontak Form)</h2>
-              <p className="text-xs text-gray-400">Pesan dari pengunjung yang tersimpan di tabel messages MySQL</p>
-            </div>
-
-            {messages.length === 0 ? (
-              <div className="bg-[#0b081e] p-12 text-center rounded-3xl border border-purple-500/20 text-gray-400">
-                <MessageSquare className="w-10 h-10 mx-auto mb-3 text-purple-400/50" />
-                <p className="text-sm">Belum ada pesan masuk dari form kontak.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`bg-[#0b081e] p-5 rounded-2xl border transition-all ${
-                      m.is_read
-                        ? 'border-purple-900/20 opacity-75'
-                        : 'border-purple-500/50 shadow-md shadow-purple-950/30'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        {!m.is_read && (
-                          <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-                        )}
-                        <h4 className="font-bold text-white text-sm sm:text-base">{m.name}</h4>
-                        <span className="text-xs text-gray-400">&lt;{m.email}&gt;</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <span>{new Date(m.created_at).toLocaleString('id-ID')}</span>
-                      </div>
-                    </div>
-
-                    <div className="text-xs font-semibold text-purple-300 mb-2">
-                      Subjek: {m.subject}
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-[#130f2e] p-3 rounded-xl border border-purple-500/20 mb-4">
-                      {m.message}
-                    </p>
-
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => toggleMessageRead(m.id, m.is_read)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-gray-300 cursor-pointer"
-                      >
-                        {m.is_read ? 'Tandai Belum Dibaca' : 'Tandai Sudah Dibaca'}
-                      </button>
-                      <a
-                        href={`mailto:${m.email}?subject=Balasan: ${encodeURIComponent(m.subject)}`}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-900/40 text-purple-200 border border-purple-500/30"
-                      >
-                        Balas via Email
-                      </a>
-                      <button
-                        onClick={() => deleteMessage(m.id)}
-                        className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950/40 cursor-pointer"
-                        title="Hapus"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================== TAB 8: SECURITY (CHANGE CREDENTIALS) ==================== */}
-        {activeTab === 'security' && (
-          <div className="space-y-6 animate-fadeIn max-w-2xl">
-            <div>
-              <h2 className="text-xl font-bold font-heading text-white">Keamanan Akun & Kredensial</h2>
-              <p className="text-xs text-gray-400">
-                Ubah username dan password akun admin. Password disimpan dalam format hash kriptografis PBKDF2-SHA512 di database MySQL (tidak pernah disimpan dalam bentuk teks biasa).
-              </p>
-            </div>
-
-            <div className="bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/30 space-y-6 shadow-xl">
-              <form onSubmit={handleUpdateCredentials} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Username Baru (Opsional, kosongkan jika tidak ingin mengubah username)
-                  </label>
-                  <input
-                    type="text"
-                    value={credForm.username}
-                    onChange={(e) => setCredForm({ ...credForm, username: e.target.value })}
-                    placeholder="Contoh: iqbal"
-                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Password Baru (Minimal 6 karakter) *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={credForm.newPassword}
-                    onChange={(e) => setCredForm({ ...credForm, newPassword: e.target.value })}
-                    placeholder="Masukkan password baru Anda"
-                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Ulangi Password Baru *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={credForm.confirmPassword}
-                    onChange={(e) => setCredForm({ ...credForm, confirmPassword: e.target.value })}
-                    placeholder="Ulangi password baru Anda"
-                    className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 transition-all"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={credLoading}
-                    className="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    {credLoading ? 'Menyimpan...' : 'Perbarui Kredensial Admin'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+          {activeTab === 'security' && (
+            <SecurityTab
+              credForm={credForm}
+              setCredForm={setCredForm}
+              credLoading={credLoading}
+              onUpdateCredentials={handleUpdateCredentials}
+            />
+          )}
         </div>
       </main>
 
-      {/* ===================== EDIT / ADD MODAL ===================== */}
-      {modalType && editingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-[#0e0a29] max-w-lg sm:max-w-xl w-full rounded-2xl sm:rounded-3xl border border-purple-500/40 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] text-white overflow-hidden relative">
-            {/* Persistent Modal Header */}
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-purple-900/40 bg-[#110c30] shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-purple-900/60 border border-purple-500/40 flex items-center justify-center text-purple-300">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold font-heading text-white">
-                    {editingItem.id ? 'Edit' : 'Tambah'} {
-                      modalType === 'project' ? 'Proyek' :
-                      modalType === 'skill' ? 'Skill' :
-                      modalType === 'experience' ? 'Pengalaman' :
-                      modalType === 'education' ? 'Pendidikan' :
-                      modalType === 'certificate' ? 'Sertifikasi' : modalType.toUpperCase()
-                    }
-                  </h3>
-                  <p className="text-[11px] text-gray-400">
-                    {editingItem.id ? 'Perbarui data yang sudah tersimpan' : 'Tambahkan item baru ke portfolio'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setModalType(null);
-                  setEditingItem(null);
-                }}
-                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
-                aria-label="Tutup modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* 3. Reusable Responsive Modal Manager */}
+      <Modal
+        isOpen={!!modalType && !!editingItem}
+        onClose={() => {
+          setModalType(null);
+          setEditingItem(null);
+        }}
+        title={`${editingItem?.id ? 'Edit' : 'Tambah'} ${
+          modalType === 'project'
+            ? 'Proyek'
+            : modalType === 'skill'
+            ? 'Skill'
+            : modalType === 'experience'
+            ? 'Pengalaman'
+            : modalType === 'education'
+            ? 'Pendidikan'
+            : modalType === 'certificate'
+            ? 'Sertifikasi'
+            : ''
+        }`}
+        subtitle={
+          editingItem?.id
+            ? 'Perbarui data yang sudah tersimpan'
+            : 'Tambahkan item baru ke portfolio'
+        }
+      >
+        {modalType === 'project' && editingItem && (
+          <ProjectForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveProject}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+            onUploadFile={handleUploadFile}
+          />
+        )}
 
-            {/* PROJECT FORM */}
-            {modalType === 'project' && (
-              <form onSubmit={saveProject} className="flex flex-col flex-1 min-h-0">
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Judul Proyek</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.title || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Deskripsi</label>
-                    <textarea
-                      rows={3}
-                      value={editingItem.description || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs text-gray-300">URL Gambar Preview</label>
-                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                        <Upload className="w-3 h-3" />
-                        <span>Upload Foto (JPG/PNG)</span>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp"
-                          className="hidden"
-                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, image_url: url }))}
-                        />
-                      </label>
-                    </div>
-                    <input
-                      type="text"
-                      value={editingItem.image_url || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, image_url: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                    {editingItem.image_url && (
-                      <div className="mt-2 h-24 rounded-xl overflow-hidden border border-purple-500/20 bg-black/40 flex items-center justify-center">
-                        <img src={editingItem.image_url} alt="Preview" className="h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Live URL Demo</label>
-                      <input
-                        type="text"
-                        value={editingItem.live_url || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, live_url: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">GitHub Repo URL</label>
-                      <input
-                        type="text"
-                        value={editingItem.github_url || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, github_url: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Tags (pisahkan dengan koma)</label>
-                    <input
-                      type="text"
-                      value={typeof editingItem.tags === 'string' ? editingItem.tags : JSON.stringify(editingItem.tags || [])}
-                      onChange={(e) => setEditingItem({ ...editingItem, tags: e.target.value })}
-                      placeholder="Next.js, Tailwind, MySQL"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 pt-1">
-                    <input
-                      type="checkbox"
-                      id="feat"
-                      checked={!!editingItem.featured}
-                      onChange={(e) => setEditingItem({ ...editingItem, featured: e.target.checked ? 1 : 0 })}
-                      className="rounded text-purple-600 focus:ring-purple-500"
-                    />
-                    <label htmlFor="feat" className="text-xs text-gray-300 cursor-pointer">Tampilkan sebagai Featured Project</label>
-                  </div>
-                </div>
+        {modalType === 'skill' && editingItem && (
+          <SkillForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveSkill}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+            onUploadFile={handleUploadFile}
+            uploadingImage={uploadingImage}
+          />
+        )}
 
-                {/* Persistent Footer */}
-                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalType(null);
-                      setEditingItem(null);
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
-                  >
-                    Simpan Proyek
-                  </button>
-                </div>
-              </form>
-            )}
+        {modalType === 'experience' && editingItem && (
+          <ExperienceForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveExperience}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+          />
+        )}
 
-            {/* SKILL FORM */}
-            {modalType === 'skill' && (
-              <form onSubmit={saveSkill} className="flex flex-col flex-1 min-h-0">
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Kategori</label>
-                      <select
-                        value={editingItem.category || 'Frontend'}
-                        onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      >
-                        <option value="Frontend">Frontend</option>
-                        <option value="Backend">Backend</option>
-                        <option value="Languages">Languages</option>
-                        <option value="Tools">Tools</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Tingkat Kemahiran</label>
-                      <select
-                        value={editingItem.level || 'Advanced'}
-                        onChange={(e) => setEditingItem({ ...editingItem, level: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      >
-                        <option value="Advanced">Advanced</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Beginner">Beginner</option>
-                      </select>
-                    </div>
-                  </div>
+        {modalType === 'education' && editingItem && (
+          <EducationForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveEducation}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+          />
+        )}
 
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Nama Skill</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.name || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                      placeholder="Contoh: Next.js"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-
-                  {/* ICON & IMAGE UPLOAD CUSTOMIZER */}
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Icon / Logo Gambar</label>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 rounded-xl bg-[#140f33] border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
-                        {editingItem.icon && isImageIcon(editingItem.icon) ? (
-                          <img src={editingItem.icon} alt="preview" className="w-7 h-7 object-contain" />
-                        ) : (
-                          (() => {
-                            const PreIcon = iconMap[editingItem.icon] || Code;
-                            return <PreIcon className="w-6 h-6 text-purple-400" />;
-                          })()
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={editingItem.icon || 'Code'}
-                          onChange={(e) => setEditingItem({ ...editingItem, icon: e.target.value })}
-                          placeholder="Nama icon (cth: Code, Zap) atau path gambar /assets/..."
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 font-mono"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Upload File Mandiri (JPG, PNG, SVG) */}
-                    <div className="p-3 rounded-xl bg-[#120e2e] border border-purple-500/20 mb-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold text-purple-300">Upload Mandiri Logo/Gambar (JPG, PNG, SVG):</span>
-                        {uploadingImage && <span className="text-[10px] text-purple-400 animate-pulse">Mengunggah ke assets...</span>}
-                      </div>
-                      <label className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-purple-400/40 hover:border-purple-400 hover:bg-purple-950/40 text-purple-200 text-xs font-medium cursor-pointer transition-all">
-                        <Upload className="w-4 h-4 text-purple-400" />
-                        <span>Pilih File Gambar dari Komputer (JPG/PNG/SVG)</span>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                          className="hidden"
-                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, icon: url }), 'skills')}
-                        />
-                      </label>
-                    </div>
-
-                    {/* Pilihan Cepat Icon Bawaan */}
-                    <div>
-                      <span className="block text-[11px] text-gray-400 mb-1.5">Atau pilih icon standar bawaan:</span>
-                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-[#120e2e] rounded-xl border border-purple-500/20 scrollbar-thin scrollbar-thumb-purple-900/40">
-                        {[
-                          { name: 'Code', label: 'HTML (<>)' },
-                          { name: 'Palette', label: 'CSS' },
-                          { name: 'FileCode', label: 'SASS' },
-                          { name: 'Zap', label: 'JavaScript' },
-                          { name: 'Atom', label: 'React JS' },
-                          { name: 'Globe', label: 'Next JS' },
-                          { name: 'Wind', label: 'Tailwind CSS' },
-                          { name: 'Layout', label: 'Bootstrap' },
-                          { name: 'Server', label: 'Node JS' },
-                          { name: 'Cpu', label: 'Express JS' },
-                          { name: 'Database', label: 'MySQL' },
-                          { name: 'HardDrive', label: 'SQLite' },
-                          { name: 'Layers', label: 'Laravel' },
-                          { name: 'Flame', label: 'Firebase' },
-                          { name: 'FileCode2', label: 'PHP' },
-                          { name: 'Terminal', label: 'Python' },
-                          { name: 'GitBranch', label: 'Git' },
-                          { name: 'Github', label: 'GitHub' },
-                          { name: 'Laptop', label: 'VS Code' },
-                          { name: 'Send', label: 'Postman' },
-                          { name: 'Triangle', label: 'Vercel' },
-                          { name: 'Figma', label: 'Figma' }
-                        ].map((ic) => {
-                          const IconComp = iconMap[ic.name] || Code;
-                          const isSelected = editingItem.icon === ic.name;
-                          return (
-                            <button
-                              type="button"
-                              key={ic.name}
-                              onClick={() => setEditingItem({ ...editingItem, icon: ic.name })}
-                              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-purple-600 text-white font-semibold shadow-md'
-                                  : 'bg-white/5 hover:bg-white/10 text-gray-300'
-                              }`}
-                            >
-                              <IconComp className="w-3.5 h-3.5" />
-                              <span>{ic.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Persistent Footer */}
-                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalType(null);
-                      setEditingItem(null);
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
-                  >
-                    Simpan Skill
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* EXPERIENCE FORM */}
-            {modalType === 'experience' && (
-              <form onSubmit={saveExperience} className="flex flex-col flex-1 min-h-0">
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Role / Posisi</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.role || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, role: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Perusahaan / Organisasi</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.company || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, company: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Periode</label>
-                      <input
-                        type="text"
-                        required
-                        value={editingItem.period || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
-                        placeholder="Juni 2024 - November 2024"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Lokasi</label>
-                      <input
-                        type="text"
-                        value={editingItem.location || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, location: e.target.value })}
-                        placeholder="Surabaya, Indonesia"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Deskripsi Tugas & Hasil</label>
-                    <textarea
-                      rows={4}
-                      value={editingItem.description || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Teknologi yang Digunakan (koma)</label>
-                    <input
-                      type="text"
-                      value={typeof editingItem.technologies === 'string' ? editingItem.technologies : JSON.stringify(editingItem.technologies || [])}
-                      onChange={(e) => setEditingItem({ ...editingItem, technologies: e.target.value })}
-                      placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Persistent Footer */}
-                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalType(null);
-                      setEditingItem(null);
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
-                  >
-                    Simpan Pengalaman
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* EDUCATION FORM */}
-            {modalType === 'education' && (
-              <form onSubmit={saveEducation} className="flex flex-col flex-1 min-h-0">
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Institusi / Sekolah</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.school || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, school: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Jurusan / Jenjang</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.degree || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, degree: e.target.value })}
-                      placeholder="Sarjana S1 Sistem Informasi"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Tahun Periode</label>
-                      <input
-                        type="text"
-                        required
-                        value={editingItem.period || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, period: e.target.value })}
-                        placeholder="2021 - 2025"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-300 mb-1">Nilai / IPK</label>
-                      <input
-                        type="text"
-                        value={editingItem.grade || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, grade: e.target.value })}
-                        placeholder="IPK: 3.4 / 4.0"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Deskripsi & Kegiatan</label>
-                    <textarea
-                      rows={3}
-                      value={editingItem.description || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Persistent Footer */}
-                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalType(null);
-                      setEditingItem(null);
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
-                  >
-                    Simpan Pendidikan
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* CERTIFICATE FORM */}
-            {modalType === 'certificate' && (
-              <form onSubmit={saveCertificate} className="flex flex-col flex-1 min-h-0">
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Nama Sertifikat</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.title || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Penerbit (Issuer)</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingItem.issuer || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, issuer: e.target.value })}
-                      placeholder="Dicoding Indonesia"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1">Tanggal Terbit</label>
-                    <input
-                      type="text"
-                      value={editingItem.issue_date || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, issue_date: e.target.value })}
-                      placeholder="25 April 2025"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs text-gray-300">URL Kredensial / PDF Sertifikat</label>
-                      <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
-                        <Upload className="w-3 h-3" />
-                        <span>Upload (PDF/JPG/PNG)</span>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp,application/pdf"
-                          className="hidden"
-                          onChange={(e) => handleUploadFile(e, (url) => setEditingItem({ ...editingItem, credential_url: url }))}
-                        />
-                      </label>
-                    </div>
-                    <input
-                      type="text"
-                      value={editingItem.credential_url || ''}
-                      onChange={(e) => setEditingItem({ ...editingItem, credential_url: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Persistent Footer */}
-                <div className="px-5 sm:px-6 py-3.5 border-t border-purple-900/40 bg-[#0a0720] shrink-0 flex items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalType(null);
-                      setEditingItem(null);
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8245ec] via-[#9333ea] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-purple-600/40 transition-all cursor-pointer"
-                  >
-                    Simpan Sertifikat
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+        {modalType === 'certificate' && editingItem && (
+          <CertificateForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveCertificate}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+            onUploadFile={handleUploadFile}
+          />
+        )}
+      </Modal>
     </div>
   );
 }
