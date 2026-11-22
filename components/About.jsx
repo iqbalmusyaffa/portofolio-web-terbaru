@@ -144,13 +144,13 @@ export default function About({ profile, projectCount, certCount, expCount }) {
 
             <div className="glass-card p-6 rounded-2xl border border-sky-200 dark:border-cyan-500/20">
               <div className="text-xs font-semibold uppercase tracking-wider text-sky-600 dark:text-cyan-400 mb-1">
-                Filosofi Kode
+                {profile?.code_philosophy_label || 'Prinsip Rekayasa'}
               </div>
               <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                {profile?.code_philosophy_title || 'Clean, Fast & Impactful'}
+                {profile?.code_philosophy_title || 'Maintainable & Scalable Architecture'}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {profile?.code_philosophy_desc || 'Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem yang stabil, mudah dirawat, dan memberikan dampak positif bagi para penggunanya.'}
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                {profile?.code_philosophy_desc || 'Mengutamakan struktur kode modular yang mudah dirawat tim, optimasi query database relasional, serta penerapan standar RESTful API yang handal.'}
               </p>
             </div>
           </div>

@@ -272,26 +272,39 @@ export default function ProfileTab({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Filosofi Kode</label>
+              <label className="block text-xs font-semibold text-gray-200 mb-1">Label Kategori Card</label>
+              <input
+                type="text"
+                value={profile.code_philosophy_label || ''}
+                onChange={(e) => setProfile({ ...profile, code_philosophy_label: e.target.value })}
+                placeholder="Prinsip Rekayasa"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+              />
+              <span className="text-[10px] text-gray-400">Cth: Prinsip Rekayasa / Standar Teknis</span>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Prinsip / Fokus</label>
               <input
                 type="text"
                 value={profile.code_philosophy_title || ''}
                 onChange={(e) => setProfile({ ...profile, code_philosophy_title: e.target.value })}
-                placeholder="Clean, Fast & Impactful"
+                placeholder="Maintainable & Scalable Architecture"
                 className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
               />
+              <span className="text-[10px] text-gray-400">Cth: Maintainable & Scalable Architecture</span>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-200 mb-1">Deskripsi Filosofi Kode</label>
+              <label className="block text-xs font-semibold text-gray-200 mb-1">Deskripsi Pendukung</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={profile.code_philosophy_desc || ''}
                 onChange={(e) => setProfile({ ...profile, code_philosophy_desc: e.target.value })}
-                placeholder="Fokus utama saya bukan sekadar menulis baris kode, melainkan menciptakan sistem..."
+                placeholder="Mengutamakan struktur kode modular yang mudah dirawat tim..."
                 className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
               />
+              <span className="text-[10px] text-gray-400">Penjelasan pendekatan kerja Anda</span>
             </div>
           </div>
         </div>
