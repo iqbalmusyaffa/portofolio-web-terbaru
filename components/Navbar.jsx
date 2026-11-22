@@ -51,7 +51,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#030014]/85 dark:bg-[#030014]/85 bg-white/85 backdrop-blur-xl border-b border-white/10 dark:border-white/10 border-gray-200/80 shadow-lg shadow-purple-950/10 py-3'
+          ? 'bg-[#030014]/90 dark:bg-[#030014]/90 bg-white/90 backdrop-blur-xl border-b border-gray-200 dark:border-purple-900/30 shadow-lg shadow-purple-950/20 py-3'
           : 'bg-transparent py-4 sm:py-5'
       }`}
     >
@@ -78,22 +78,19 @@ export default function Navbar() {
                 <a
                   key={link.name}
                   href={link.href}
-                  className={`px-3 py-1.5 lg:px-3.5 lg:py-2 text-xs lg:text-sm font-medium rounded-xl transition-all duration-200 relative ${
+                  className={`px-3 py-1.5 lg:px-3.5 lg:py-2 text-xs lg:text-sm font-medium rounded-xl transition-all duration-200 ${
                     isActive
-                      ? 'text-white dark:text-white text-purple-700 bg-purple-900/30 dark:bg-purple-900/40 bg-purple-100 font-semibold shadow-sm'
+                      ? 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 font-semibold shadow-md shadow-purple-950/40 border border-purple-400/30'
                       : 'text-gray-300 dark:text-gray-300 text-gray-700 hover:text-white dark:hover:text-white hover:text-purple-700 hover:bg-white/5 dark:hover:bg-white/5 hover:bg-gray-100'
                   }`}
                 >
                   {link.name}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#a78bfa] rounded-full animate-fadeIn" />
-                  )}
                 </a>
               );
             })}
 
             {/* Dark / Light Mode Switcher */}
-            <div className="ml-2 pl-2 border-l border-white/10 dark:border-white/10 border-gray-300">
+            <div className="ml-2 pl-2 border-l border-gray-200 dark:border-purple-900/40">
               <button
                 onClick={toggleTheme}
                 aria-label="Ganti Mode Tema"
@@ -136,7 +133,7 @@ export default function Navbar() {
 
       {/* Mobile Dropdown Drawer */}
       {isOpen && (
-        <div className="md:hidden bg-[#050414]/95 dark:bg-[#050414]/95 bg-white/95 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 border-gray-200 px-4 pt-3 pb-6 space-y-1.5 animate-fadeIn shadow-2xl">
+        <div className="md:hidden bg-[#050414]/95 dark:bg-[#050414]/95 bg-white/95 backdrop-blur-2xl border-b border-gray-200 dark:border-purple-900/30 px-4 pt-3 pb-6 space-y-1.5 animate-fadeIn shadow-2xl">
           {navLinks.map((link) => {
             const isActive = activeSection === link.id;
             return (
