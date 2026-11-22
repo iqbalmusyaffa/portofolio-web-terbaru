@@ -47,6 +47,7 @@ export async function PUT(request) {
       about_bio_2,
       about_highlights,
       availability_status,
+      relocation_cities,
       code_philosophy_title,
       code_philosophy_desc,
       gpa_score,
@@ -90,6 +91,7 @@ export async function PUT(request) {
       }
     }
     const cleanAvailability = sanitizeString(availability_status || '', 255);
+    const cleanRelocationCities = sanitizeString(relocation_cities || 'Jakarta, Surabaya, Bandung, Tangerang, Yogyakarta, Semarang, Sidoarjo, Malang, Banyuwangi, Remote (WFH)', 2000);
     const cleanPhilTitle = sanitizeString(code_philosophy_title || 'Clean, Fast & Impactful', 150);
     const cleanPhilDesc = sanitizeString(code_philosophy_desc || '', 3000);
     const cleanGpa = sanitizeString(gpa_score || '3.40', 50);
@@ -113,7 +115,7 @@ export async function PUT(request) {
           name = ?, full_name = ?, tagline = ?, roles = ?, bio = ?, avatar_url = ?, 
           cv_url = ?, cv_pdf_url = ?, github_url = ?, linkedin_url = ?, instagram_url = ?, facebook_url = ?, 
           email = ?, location = ?,
-          about_title = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?,
+          about_title = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?, relocation_cities = ?,
           code_philosophy_title = ?, code_philosophy_desc = ?, gpa_score = ?,
           meta_title = ?, meta_description = ?, meta_keywords = ?, og_image = ?,
           canonical_url = ?, google_site_verification = ?
@@ -122,7 +124,7 @@ export async function PUT(request) {
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
           cleanCv, cleanCvPdf, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
           cleanEmail, cleanLocation,
-          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
+          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability, cleanRelocationCities,
           cleanPhilTitle, cleanPhilDesc, cleanGpa,
           cleanMetaTitle, cleanMetaDesc, cleanMetaKeywords, cleanOgImage,
           cleanCanonical, cleanGVerify, existing[0].id
@@ -133,16 +135,16 @@ export async function PUT(request) {
         `INSERT INTO profile (
           name, full_name, tagline, roles, bio, avatar_url, cv_url, cv_pdf_url, github_url,
           linkedin_url, instagram_url, facebook_url, email, location,
-          about_title, about_bio_2, about_highlights, availability_status,
+          about_title, about_bio_2, about_highlights, availability_status, relocation_cities,
           code_philosophy_title, code_philosophy_desc, gpa_score,
           meta_title, meta_description, meta_keywords, og_image,
           canonical_url, google_site_verification
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
           cleanCv, cleanCvPdf, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
           cleanEmail, cleanLocation,
-          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability,
+          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability, cleanRelocationCities,
           cleanPhilTitle, cleanPhilDesc, cleanGpa,
           cleanMetaTitle, cleanMetaDesc, cleanMetaKeywords, cleanOgImage,
           cleanCanonical, cleanGVerify
@@ -170,6 +172,7 @@ export async function PUT(request) {
       about_bio_2: cleanAboutBio2,
       about_highlights: highlightsStr,
       availability_status: cleanAvailability,
+      relocation_cities: cleanRelocationCities,
       code_philosophy_title: cleanPhilTitle,
       code_philosophy_desc: cleanPhilDesc,
       gpa_score: cleanGpa,

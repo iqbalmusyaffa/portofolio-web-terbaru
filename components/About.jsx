@@ -113,18 +113,22 @@ export default function About({ profile, projectCount, certCount, expCount }) {
                   Siap Bekerja & Relokasi di:
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    'Jakarta',
-                    'Surabaya',
-                    'Bandung',
-                    'Tangerang',
-                    'Yogyakarta',
-                    'Semarang',
-                    'Sidoarjo',
-                    'Malang',
-                    'Banyuwangi',
-                    'Remote (WFH)'
-                  ].map((city, idx) => (
+                  {(
+                    profile?.relocation_cities
+                      ? profile.relocation_cities.split(',').map((c) => c.trim()).filter(Boolean)
+                      : [
+                          'Jakarta',
+                          'Surabaya',
+                          'Bandung',
+                          'Tangerang',
+                          'Yogyakarta',
+                          'Semarang',
+                          'Sidoarjo',
+                          'Malang',
+                          'Banyuwangi',
+                          'Remote (WFH)'
+                        ]
+                  ).map((city, idx) => (
                     <span
                       key={idx}
                       className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30"
