@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
 
@@ -7,12 +8,12 @@ export async function GET() {
     await ensureDatabaseAndTables();
     const rows = await query('SELECT * FROM skills ORDER BY category ASC, id ASC');
     if (rows && rows.length > 0) {
-      return NextResponse.json({ success: true, data: rows });
+      return successResponse(rows);
     }
-    return NextResponse.json({ success: true, data: getFallbackData().skills });
+    return successResponse(getFallbackData().skills);
   } catch (err) {
     console.error('Error fetching skills:', err);
-    return NextResponse.json({ success: true, data: getFallbackData().skills, fallback: true });
+    return successResponse(getFallbackData().skills);
   }
 }
 
@@ -25,7 +26,7 @@ export async function POST(request) {
     const { category, name, icon = 'Code', level = 'Advanced' } = body;
 
     if (!category || !name) {
-      return NextResponse.json({ success: false, error: 'Kategori dan nama skill wajib diisi' }, { status: 400 });
+      return errorResponse('Kategori dan nama skill wajib diisi', 400);
     }
 
     const cleanCategory = sanitizeString(category, 50);
@@ -42,10 +43,10 @@ export async function POST(request) {
     const newSkill = { id: result.insertId || Date.now(), category: cleanCategory, name: cleanName, icon: cleanIcon, level: cleanLevel };
     getFallbackData().skills.push(newSkill);
 
-    return NextResponse.json({ success: true, data: newSkill });
+    return successResponse(newSkill);
   } catch (err) {
     console.error('Error creating skill:', err);
-    return NextResponse.json({ success: false, error: 'Gagal menambahkan skill' }, { status: 500 });
+    return errorResponse('Gagal menambahkan skill', 500);
   }
 }
 
@@ -59,7 +60,7 @@ export async function PUT(request) {
     const { category, name, icon = 'Code', level = 'Advanced' } = body;
 
     if (!id || !category || !name) {
-      return NextResponse.json({ success: false, error: 'ID, Kategori dan nama skill wajib diisi' }, { status: 400 });
+      return errorResponse('ID, Kategori dan nama skill wajib diisi', 400);
     }
 
     const cleanCategory = sanitizeString(category, 50);
@@ -79,10 +80,10 @@ export async function PUT(request) {
       list[idx] = { id, category: cleanCategory, name: cleanName, icon: cleanIcon, level: cleanLevel };
     }
 
-    return NextResponse.json({ success: true, message: 'Skill berhasil diperbarui' });
+    return successResponse(null, 200, 'Skill berhasil diperbarui');
   } catch (err) {
     console.error('Error updating skill:', err);
-    return NextResponse.json({ success: false, error: 'Gagal memperbarui skill' }, { status: 500 });
+    return errorResponse('Gagal memperbarui skill', 500);
   }
 }
 
@@ -95,7 +96,7 @@ export async function DELETE(request) {
     const id = parseValidId(searchParams.get('id'));
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'ID skill tidak valid' }, { status: 400 });
+      return errorResponse('ID skill tidak valid', 400);
     }
 
     await ensureDatabaseAndTables();
@@ -104,9 +105,9 @@ export async function DELETE(request) {
     const fallback = getFallbackData();
     fallback.skills = fallback.skills.filter(s => s.id !== id);
 
-    return NextResponse.json({ success: true, message: 'Skill berhasil dihapus' });
+    return successResponse(null, 200, 'Skill berhasil dihapus');
   } catch (err) {
     console.error('Error deleting skill:', err);
-    return NextResponse.json({ success: false, error: 'Gagal menghapus skill' }, { status: 500 });
+    return errorResponse('Gagal menghapus skill', 500);
   }
 }

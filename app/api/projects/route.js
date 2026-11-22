@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
 
@@ -7,12 +8,12 @@ export async function GET() {
     await ensureDatabaseAndTables();
     const rows = await query('SELECT * FROM projects ORDER BY featured DESC, id DESC');
     if (rows && rows.length > 0) {
-      return NextResponse.json({ success: true, data: rows });
+      return successResponse(rows);
     }
-    return NextResponse.json({ success: true, data: getFallbackData().projects });
+    return successResponse(getFallbackData().projects);
   } catch (err) {
     console.error('Error fetching projects:', err);
-    return NextResponse.json({ success: true, data: getFallbackData().projects, fallback: true });
+    return successResponse(getFallbackData().projects);
   }
 }
 
@@ -25,7 +26,7 @@ export async function POST(request) {
     const { title, description, live_url, github_url, image_url, tags, featured = 0 } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      return NextResponse.json({ success: false, error: 'Judul proyek wajib diisi' }, { status: 400 });
+      return errorResponse('Judul proyek wajib diisi', 400);
     }
 
     const cleanTitle = sanitizeString(title, 200);
@@ -53,10 +54,10 @@ export async function POST(request) {
     };
     getFallbackData().projects.unshift(newProj);
 
-    return NextResponse.json({ success: true, data: newProj });
+    return successResponse(newProj);
   } catch (err) {
     console.error('Error creating project:', err);
-    return NextResponse.json({ success: false, error: 'Gagal menambahkan proyek' }, { status: 500 });
+    return errorResponse('Gagal menambahkan proyek', 500);
   }
 }
 
@@ -70,7 +71,7 @@ export async function PUT(request) {
     const { title, description, live_url, github_url, image_url, tags, featured = 0 } = body;
 
     if (!id || !title) {
-      return NextResponse.json({ success: false, error: 'ID dan judul proyek wajib diisi' }, { status: 400 });
+      return errorResponse('ID dan judul proyek wajib diisi', 400);
     }
 
     const cleanTitle = sanitizeString(title, 200);
@@ -92,10 +93,10 @@ export async function PUT(request) {
       list[idx] = { id, title: cleanTitle, description: cleanDesc, live_url: cleanLiveUrl, github_url: cleanGithubUrl, image_url: cleanImageUrl, tags: tagsStr, featured: featured ? 1 : 0 };
     }
 
-    return NextResponse.json({ success: true, message: 'Proyek berhasil diperbarui' });
+    return successResponse(null, 200, 'Proyek berhasil diperbarui');
   } catch (err) {
     console.error('Error updating project:', err);
-    return NextResponse.json({ success: false, error: 'Gagal memperbarui proyek' }, { status: 500 });
+    return errorResponse('Gagal memperbarui proyek', 500);
   }
 }
 
@@ -108,7 +109,7 @@ export async function DELETE(request) {
     const id = parseValidId(searchParams.get('id'));
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'ID proyek tidak valid' }, { status: 400 });
+      return errorResponse('ID proyek tidak valid', 400);
     }
 
     await ensureDatabaseAndTables();
@@ -117,9 +118,9 @@ export async function DELETE(request) {
     const fallback = getFallbackData();
     fallback.projects = fallback.projects.filter(p => p.id !== id);
 
-    return NextResponse.json({ success: true, message: 'Proyek berhasil dihapus' });
+    return successResponse(null, 200, 'Proyek berhasil dihapus');
   } catch (err) {
     console.error('Error deleting project:', err);
-    return NextResponse.json({ success: false, error: 'Gagal menghapus proyek' }, { status: 500 });
+    return errorResponse('Gagal menghapus proyek', 500);
   }
 }
