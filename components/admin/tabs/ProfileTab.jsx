@@ -1,6 +1,7 @@
 'use client';
 
 import { Upload, Save } from 'lucide-react';
+import CityTagSelector from '@/components/admin/CityTagSelector';
 
 export default function ProfileTab({
   profile = {},
@@ -256,21 +257,10 @@ export default function ProfileTab({
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-200 mb-1">
-              Daftar Kota Siap Bekerja &amp; Relokasi (Pisahkan dengan koma)
-            </label>
-            <input
-              type="text"
-              value={profile.relocation_cities || ''}
-              onChange={(e) => setProfile({ ...profile, relocation_cities: e.target.value })}
-              placeholder="Jakarta, Surabaya, Bandung, Tangerang, Yogyakarta, Semarang, Sidoarjo, Malang, Banyuwangi, Remote (WFH)"
-              className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-            />
-            <span className="text-[11px] text-gray-400">
-              Setiap nama kota yang dipisahkan koma akan otomatis menjadi badge ungu di bagian &quot;Siap Bekerja &amp; Relokasi di:&quot; halaman website.
-            </span>
-          </div>
+          <CityTagSelector
+            value={profile.relocation_cities || ''}
+            onChange={(val) => setProfile({ ...profile, relocation_cities: val })}
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
