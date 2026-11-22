@@ -1,10 +1,12 @@
 'use client';
 
 import { Upload } from 'lucide-react';
+import SkillTagSelector from '@/components/admin/SkillTagSelector';
 
 export default function ProjectForm({
   item,
   setItem,
+  skills = [],
   onSubmit,
   onClose,
   onUploadFile
@@ -77,16 +79,13 @@ export default function ProjectForm({
             />
           </div>
         </div>
-        <div>
-          <label className="block text-xs text-gray-300 mb-1">Tags (pisahkan dengan koma)</label>
-          <input
-            type="text"
-            value={typeof item.tags === 'string' ? item.tags : JSON.stringify(item.tags || [])}
-            onChange={(e) => setItem({ ...item, tags: e.target.value })}
-            placeholder="Next.js, Tailwind, MySQL"
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-          />
-        </div>
+        <SkillTagSelector
+          label="Tags (pisahkan dengan koma)"
+          value={typeof item.tags === 'string' ? item.tags : JSON.stringify(item.tags || [])}
+          onChange={(val) => setItem({ ...item, tags: val })}
+          skills={skills}
+          placeholder="Next.js, React, Tailwind, MySQL"
+        />
         <div className="flex items-center gap-2 pt-1">
           <input
             type="checkbox"

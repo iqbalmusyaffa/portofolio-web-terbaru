@@ -787,6 +787,7 @@ export default function AdminPage() {
           <ProjectForm
             item={editingItem}
             setItem={setEditingItem}
+            skills={skills}
             onSubmit={saveProject}
             onClose={() => {
               setModalType(null);
@@ -814,6 +815,7 @@ export default function AdminPage() {
           <ExperienceForm
             item={editingItem}
             setItem={setEditingItem}
+            skills={skills}
             onSubmit={saveExperience}
             onClose={() => {
               setModalType(null);

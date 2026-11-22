@@ -1,8 +1,11 @@
 'use client';
 
+import SkillTagSelector from '@/components/admin/SkillTagSelector';
+
 export default function ExperienceForm({
   item,
   setItem,
+  skills = [],
   onSubmit,
   onClose
 }) {
@@ -61,16 +64,13 @@ export default function ExperienceForm({
             className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
           />
         </div>
-        <div>
-          <label className="block text-xs text-gray-300 mb-1">Teknologi yang Digunakan (koma)</label>
-          <input
-            type="text"
-            value={typeof item.technologies === 'string' ? item.technologies : JSON.stringify(item.technologies || [])}
-            onChange={(e) => setItem({ ...item, technologies: e.target.value })}
-            placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-          />
-        </div>
+        <SkillTagSelector
+          label="Teknologi yang Digunakan (koma)"
+          value={typeof item.technologies === 'string' ? item.technologies : JSON.stringify(item.technologies || [])}
+          onChange={(val) => setItem({ ...item, technologies: val })}
+          skills={skills}
+          placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
+        />
       </div>
 
       {/* Persistent Footer */}
