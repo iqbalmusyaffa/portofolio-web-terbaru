@@ -1,8 +1,11 @@
 'use client';
 
 import { Github, Linkedin, Instagram, Facebook, ArrowUp } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Footer({ profile }) {
+  const { t } = useLanguage();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -78,7 +81,7 @@ export default function Footer({ profile }) {
       </div>
 
       <div className="text-center text-[11px] text-gray-500 mt-8">
-        &copy; {new Date().getFullYear()} Iqbal Musyaffa. All rights reserved.
+        &copy; {new Date().getFullYear()} {profile?.name || 'Iqbal Musyaffa'}. {t('footer.rights')}
       </div>
     </footer>
   );

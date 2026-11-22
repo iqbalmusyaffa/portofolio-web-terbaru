@@ -1,6 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+import { Bot } from 'lucide-react';
 import SkillTagSelector from '@/components/admin/SkillTagSelector';
+import AiAssistantModal from '@/components/admin/AiAssistantModal';
 
 export default function ExperienceForm({
   item,
@@ -9,6 +12,7 @@ export default function ExperienceForm({
   onSubmit,
   onClose
 }) {
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0">
       <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
@@ -56,7 +60,17 @@ export default function ExperienceForm({
           </div>
         </div>
         <div>
-          <label className="block text-xs text-gray-300 mb-1">Deskripsi Tugas & Hasil</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-xs text-gray-300">Deskripsi Tugas &amp; Hasil</label>
+            <button
+              type="button"
+              onClick={() => setAiModalOpen(true)}
+              className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <Bot className="w-3 h-3" />
+              <span>Bantuan AI (Terjemah / Poles)</span>
+            </button>
+          </div>
           <textarea
             rows={4}
             value={item.description || ''}
@@ -89,6 +103,14 @@ export default function ExperienceForm({
           Simpan Pengalaman
         </button>
       </div>
+
+      <AiAssistantModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        initialText={item.description || ''}
+        onApply={(val) => setItem({ ...item, description: val })}
+        title="Asisten AI: Deskripsi Pengalaman"
+      />
     </form>
   );
 }

@@ -1,21 +1,24 @@
 'use client';
 
 import { Calendar, MapPin, Building2 } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Experience({ experiences }) {
+  const { t } = useLanguage();
+
   return (
     <section id="experience" className="py-20 px-4 relative z-10">
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Karier & Rekam Jejak
+            {t('experience.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Pengalaman Kerja & Bootcamp
+            {t('experience.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Perjalanan profesional, magang, dan proyek intensif yang memperkuat pemahaman saya tentang industri software engineering.
+            {t('experience.desc')}
           </p>
         </div>
 

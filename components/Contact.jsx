@@ -2,8 +2,10 @@
 
 import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, MessageSquare } from 'lucide-react';
 import { useContactForm } from '@/hooks/useContactForm';
+import { useLanguage } from './LanguageProvider';
 
 export default function Contact({ profile }) {
+  const { t } = useLanguage();
   const { formData, setFormData, loading, status, handleSubmit } = useContactForm();
 
   return (
@@ -12,13 +14,13 @@ export default function Contact({ profile }) {
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Kontak & Kolaborasi
+            {t('contact.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Mari Memulai Diskusi
+            {t('contact.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Tertarik untuk berkolaborasi, mendiskusikan peluang proyek, atau sekadar bertukar ide? Jangan ragu untuk menghubungi saya!
+            {t('contact.desc')}
           </p>
         </div>
 
@@ -28,7 +30,7 @@ export default function Contact({ profile }) {
             <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-gray-200 dark:border-white/10 space-y-6 shadow-md dark:shadow-none">
               <h3 className="text-lg font-bold font-heading text-gray-900 dark:text-white flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                Informasi Kontak
+                {t('contact.info_title')}
               </h3>
 
               <div className="flex items-start gap-4">
@@ -111,13 +113,13 @@ export default function Contact({ profile }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Nama Lengkap <span className="text-rose-500">*</span>
+                    {t('contact.name_label')} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     maxLength={100}
-                    placeholder="Contoh: Budi Santoso"
+                    placeholder={t('contact.name_placeholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-purple-500 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm"
@@ -126,13 +128,13 @@ export default function Contact({ profile }) {
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Alamat Email <span className="text-rose-500">*</span>
+                    {t('contact.email_label')} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="email"
                     required
                     maxLength={120}
-                    placeholder="nama@perusahaan.com"
+                    placeholder={t('contact.email_placeholder')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-purple-500 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm"
@@ -142,12 +144,12 @@ export default function Contact({ profile }) {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Subjek
+                  {t('contact.subject_label')}
                 </label>
                 <input
                   type="text"
                   maxLength={150}
-                  placeholder="Tawaran Proyek / Diskusi Kolaborasi"
+                  placeholder={t('contact.subject_placeholder')}
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-purple-500 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm"
@@ -156,13 +158,13 @@ export default function Contact({ profile }) {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Pesan <span className="text-rose-500">*</span>
+                  {t('contact.message_label')} <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   required
                   rows={5}
                   maxLength={3000}
-                  placeholder="Tuliskan pesan atau detail proyek Anda di sini..."
+                  placeholder={t('contact.message_placeholder')}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-purple-500 placeholder-gray-400 dark:placeholder-gray-500 transition-all resize-none shadow-sm"
@@ -177,12 +179,12 @@ export default function Contact({ profile }) {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Menyimpan ke MySQL...</span>
+                    <span>{t('contact.sending')}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>Kirim Pesan Sekarang</span>
+                    <span>{t('contact.send')}</span>
                   </>
                 )}
               </button>

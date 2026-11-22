@@ -1,13 +1,16 @@
 'use client';
 
 import { Code2, Award, Briefcase, GraduationCap, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function About({ profile, projectCount, certCount, expCount }) {
+  const { t } = useLanguage();
+
   const stats = [
-    { label: 'Proyek Selesai', value: `${projectCount || 6}+`, icon: Code2, desc: 'Web & Backend' },
-    { label: 'Sertifikasi', value: `${certCount || 17}+`, icon: Award, desc: 'Dicoding & Komdigi' },
-    { label: 'Pengalaman', value: `${expCount || 2}+`, icon: Briefcase, desc: 'Intern & Bootcamp' },
-    { label: 'IPK Telkom', value: profile?.gpa_score || '3.40', icon: GraduationCap, desc: 'S1 Sistem Informasi' },
+    { label: t('about.stats.projects'), value: `${projectCount || 6}+`, icon: Code2, desc: t('about.stats.projects_sub') },
+    { label: t('about.stats.certs'), value: `${certCount || 17}+`, icon: Award, desc: t('about.stats.certs_sub') },
+    { label: t('about.stats.exp'), value: `${expCount || 2}+`, icon: Briefcase, desc: t('about.stats.exp_sub') },
+    { label: t('about.stats.gpa'), value: profile?.gpa_score || '3.40', icon: GraduationCap, desc: t('about.stats.gpa_sub') },
   ];
 
   let highlights = [
@@ -35,13 +38,13 @@ export default function About({ profile, projectCount, certCount, expCount }) {
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Tentang Saya
+            {t('about.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Dedikasi & Latar Belakang
+            {t('about.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Mengenal lebih dekat latar belakang, keahlian, dan komitmen profesional saya dalam rekayasa perangkat lunak.
+            {t('about.desc')}
           </p>
         </div>
 
@@ -112,7 +115,7 @@ export default function About({ profile, projectCount, certCount, expCount }) {
               {/* Badges Kota Pilihan */}
               <div className="pt-3 border-t border-purple-200 dark:border-purple-900/30">
                 <div className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                  Siap Bekerja & Relokasi di:
+                  {t('about.relocation_title')}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {(

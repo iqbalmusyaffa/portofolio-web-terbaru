@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { Award, ExternalLink, Calendar, Building, Search } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Certifications({ certificates }) {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [limit, setLimit] = useState(6);
 
@@ -24,13 +26,13 @@ export default function Certifications({ certificates }) {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Lisensi & Sertifikasi
+            {t('certifications.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Sertifikasi Profesional
+            {t('certifications.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Sertifikasi resmi dan lisensi kompetensi di bidang Software Engineering, AI, Cloud, Cybersecurity, dan Pemrograman.
+            {t('certifications.desc')}
           </p>
         </div>
 
@@ -40,7 +42,7 @@ export default function Certifications({ certificates }) {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Cari sertifikat (contoh: Dicoding, Python, AI)..."
+              placeholder={t('certifications.search_placeholder')}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);

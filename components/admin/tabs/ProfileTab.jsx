@@ -1,7 +1,9 @@
 'use client';
 
-import { Upload, Save } from 'lucide-react';
+import { useState } from 'react';
+import { Upload, Save, Bot } from 'lucide-react';
 import CityTagSelector from '@/components/admin/CityTagSelector';
+import AiAssistantModal from '@/components/admin/AiAssistantModal';
 
 export default function ProfileTab({
   profile = {},
@@ -9,6 +11,11 @@ export default function ProfileTab({
   onSave,
   onUploadFile
 }) {
+  const [aiModal, setAiModal] = useState({ isOpen: false, text: '', onApply: null, title: '' });
+
+  const openAiModal = (title, initialText, onApply) => {
+    setAiModal({ isOpen: true, text: initialText, onApply, title });
+  };
   return (
     <div className="max-w-4xl bg-[#0b081e] p-6 sm:p-8 rounded-3xl border border-purple-500/20 space-y-8 animate-fadeIn shadow-2xl">
       <div>
@@ -185,7 +192,17 @@ export default function ProfileTab({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 1 Bio</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-gray-200">Paragraf 1 Bio</label>
+                <button
+                  type="button"
+                  onClick={() => openAiModal('Bantuan AI: Paragraf 1 Bio', profile.bio || '', (val) => setProfile({ ...profile, bio: val }))}
+                  className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Bot className="w-3 h-3" />
+                  <span>Bantuan AI</span>
+                </button>
+              </div>
               <textarea
                 rows={4}
                 value={profile.bio || ''}
@@ -195,7 +212,17 @@ export default function ProfileTab({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-200 mb-1">Paragraf 2 Bio</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-gray-200">Paragraf 2 Bio</label>
+                <button
+                  type="button"
+                  onClick={() => openAiModal('Bantuan AI: Paragraf 2 Bio', profile.about_bio_2 || '', (val) => setProfile({ ...profile, about_bio_2: val }))}
+                  className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Bot className="w-3 h-3" />
+                  <span>Bantuan AI</span>
+                </button>
+              </div>
               <textarea
                 rows={4}
                 value={profile.about_bio_2 || ''}
@@ -309,6 +336,14 @@ export default function ProfileTab({
           </button>
         </div>
       </form>
+
+      <AiAssistantModal
+        isOpen={aiModal.isOpen}
+        onClose={() => setAiModal({ ...aiModal, isOpen: false })}
+        initialText={aiModal.text}
+        onApply={aiModal.onApply}
+        title={aiModal.title}
+      />
     </div>
   );
 }

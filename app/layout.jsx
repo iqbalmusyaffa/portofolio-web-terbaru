@@ -1,5 +1,6 @@
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { LanguageProvider } from '@/components/LanguageProvider';
 
 export const metadata = {
   title: 'Iqbal Musyaffa - Software Engineer & Fullstack Developer',
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-screen bg-[#030014] dark:bg-[#030014] text-gray-900 dark:text-gray-100 antialiased selection:bg-[#8245ec] selection:text-white transition-colors duration-300">
         <ThemeProvider>
-          {children}
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

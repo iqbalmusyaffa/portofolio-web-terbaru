@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { ExternalLink, Github, Star, Info, X } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Projects({ projects }) {
+  const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('Semua');
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -59,13 +61,13 @@ export default function Projects({ projects }) {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Portofolio Karya
+            {t('projects.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Proyek Pilihan & Rekayasa Web
+            {t('projects.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Karya dan proyek aplikasi nyata yang telah saya rancang dan kembangkan dengan standar arsitektur modern.
+            {t('projects.desc')}
           </p>
         </div>
 
@@ -81,7 +83,7 @@ export default function Projects({ projects }) {
                   : 'bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
               }`}
             >
-              {f}
+              {f === 'Semua' ? t('projects.filter.all') : f}
             </button>
           ))}
         </div>

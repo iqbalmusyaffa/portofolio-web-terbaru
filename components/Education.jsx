@@ -1,21 +1,24 @@
 'use client';
 
 import { GraduationCap, Calendar, MapPin, Award } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Education({ educations }) {
+  const { t } = useLanguage();
+
   return (
     <section id="education" className="py-20 px-4 relative z-10">
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Riwayat Pendidikan
+            {t('education.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Latar Belakang Akademik
+            {t('education.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Fondasi akademik dan pembentukan karakter disiplin kepemimpinan yang saya tempuh.
+            {t('education.desc')}
           </p>
         </div>
 

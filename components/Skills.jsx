@@ -2,11 +2,13 @@
 
 import { CheckCircle2 } from 'lucide-react';
 import { iconMap, defaultSkillIconMap, isImageIcon } from '@/lib/constants/skills';
+import { useLanguage } from './LanguageProvider';
 
 // Re-export constants for backwards compatibility
 export { iconMap, defaultSkillIconMap, isImageIcon };
 
 export default function Skills({ skills }) {
+  const { t } = useLanguage();
   const categories = ['Frontend', 'Backend', 'Languages', 'Tools'];
   
   const groupedSkills = categories.reduce((acc, cat) => {
@@ -22,13 +24,13 @@ export default function Skills({ skills }) {
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
-            Keahlian Teknis
+            {t('skills.eyebrow')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
-            Tech Stack & Kemampuan
+            {t('skills.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Kumpulan teknologi, bahasa pemrograman, dan alat bantu pengembangan yang saya kuasai dan gunakan dalam proyek nyata.
+            {t('skills.desc')}
           </p>
         </div>
 

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Download, Github, Linkedin, Instagram, Facebook, ArrowRight, ExternalLink } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
 
 export default function Hero({ profile }) {
+  const { t, language } = useLanguage();
   const defaultRoles = ["Software Engineer", "Fullstack Developer", "Problem Solver"];
   
   let roles = defaultRoles;
@@ -81,14 +83,14 @@ export default function Hero({ profile }) {
           {/* Status badge */}
           <div className="absolute bottom-2 right-2 bg-white dark:bg-[#07051a] border border-gray-200 dark:border-white/10 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
             <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
-            <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200">Open to Work</span>
+            <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200">{t('hero.available')}</span>
           </div>
         </div>
 
         {/* Greeting Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium mb-4 backdrop-blur-md shadow-sm">
           <span>👋</span>
-          <span>Halo, perkenalkan saya</span>
+          <span>{t('hero.greeting')}</span>
         </div>
 
         {/* Name */}
@@ -98,7 +100,7 @@ export default function Hero({ profile }) {
 
         {/* Roles with Typewriter Effect */}
         <div className="min-h-[40px] flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-semibold mb-5 font-heading text-gray-800 dark:text-gray-200">
-          <span className="text-gray-500 dark:text-gray-400 mr-2">I am a</span>
+          <span className="text-gray-500 dark:text-gray-400 mr-2">{t('hero.iam')}</span>
           <span className="text-purple-600 dark:text-[#a78bfa] font-bold">
             {currentText}
           </span>
@@ -121,7 +123,7 @@ export default function Hero({ profile }) {
               title="Unduh langsung file CV (PDF)"
             >
               <Download className="w-4 h-4 animate-bounce" />
-              <span>Unduh CV</span>
+              <span>{t('hero.download_cv')}</span>
             </a>
 
             <div className="w-[1px] h-5 bg-white/30" />
@@ -133,7 +135,7 @@ export default function Hero({ profile }) {
               className="inline-flex items-center gap-1 pl-3 pr-5 py-3 text-xs sm:text-sm font-semibold text-purple-100 hover:text-white hover:bg-white/10 rounded-r-full transition-colors cursor-pointer"
               title="Buka di Google Drive"
             >
-              <span>Drive</span>
+              <span>{t('hero.drive')}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -142,7 +144,7 @@ export default function Hero({ profile }) {
             href="#contact"
             className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 hover:border-purple-400/50 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-md shadow-sm"
           >
-            <span>Hubungi Saya</span>
+            <span>{t('hero.contact_me')}</span>
             <ArrowRight className="w-4 h-4 text-[#8245ec] dark:text-[#a78bfa]" />
           </a>
         </div>
