@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, Sparkles, MessageSquare } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, MessageSquare } from 'lucide-react';
 import { useContactForm } from '@/hooks/useContactForm';
 
 export default function Contact({ profile }) {
@@ -10,12 +10,14 @@ export default function Contact({ profile }) {
     <section id="contact" className="py-20 px-4 relative z-10">
       <div className="max-w-5xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] via-[#c026d3] to-[#0284c7] dark:from-[#a78bfa] dark:via-[#e879f9] dark:to-[#38bdf8]">
-            CONTACT ME
+        <div className="text-center mb-14">
+          <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
+            Kontak & Kolaborasi
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
+            Mari Memulai Diskusi
           </h2>
-          <div className="w-20 h-1 bg-[#8245ec] mx-auto mt-3 rounded-full" />
-          <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Tertarik untuk berkolaborasi, mendiskusikan peluang proyek, atau sekadar bertukar ide? Jangan ragu untuk menghubungi saya!
           </p>
         </div>
@@ -25,8 +27,8 @@ export default function Contact({ profile }) {
           <div className="lg:col-span-5 space-y-6">
             <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-gray-200 dark:border-white/10 space-y-6 shadow-md dark:shadow-none">
               <h3 className="text-lg font-bold font-heading text-gray-900 dark:text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-600 dark:text-[#e879f9]" />
-                Mari Terhubung
+                <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                Informasi Kontak
               </h3>
 
               <div className="flex items-start gap-4">

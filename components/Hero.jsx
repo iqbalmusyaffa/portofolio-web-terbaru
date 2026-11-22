@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Download, Github, Linkedin, Instagram, Facebook, ArrowRight, Sparkles, ExternalLink } from 'lucide-react';
+import { Download, Github, Linkedin, Instagram, Facebook, ArrowRight, ExternalLink } from 'lucide-react';
 
 export default function Hero({ profile }) {
   const defaultRoles = ["Software Engineer", "Fullstack Developer", "Problem Solver"];
@@ -59,15 +59,15 @@ export default function Hero({ profile }) {
   return (
     <section id="hero" className="relative min-h-[92vh] flex items-center justify-center pt-28 pb-16 px-4 overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-tr from-purple-600/20 via-fuchsia-600/15 to-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-72 h-72 bg-purple-900/15 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-900/10 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/[0.08] dark:bg-purple-600/[0.12] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 left-10 w-72 h-72 bg-indigo-600/[0.05] rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-900/[0.08] rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
-        {/* Profile Avatar with glowing neon ring */}
+        {/* Profile Avatar with clean subtle frame */}
         <div className="relative mb-6 group">
-          <div className="absolute -inset-2 bg-gradient-to-r from-[#8245ec] via-[#e879f9] to-[#38bdf8] rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse-glow" />
-          <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full overflow-hidden border-2 border-purple-400/60 bg-[#0c0822] shadow-2xl flex items-center justify-center">
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-b from-purple-500/30 to-transparent blur-sm opacity-70 group-hover:opacity-100 transition duration-500" />
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full overflow-hidden border border-white/20 dark:border-white/10 ring-4 ring-purple-500/10 bg-[#0c0822] shadow-2xl flex items-center justify-center">
             <img
               src={avatarUrl}
               alt={name}
@@ -79,24 +79,21 @@ export default function Hero({ profile }) {
             />
           </div>
           {/* Status badge */}
-          <div className="absolute bottom-2 right-2 bg-white dark:bg-[#050414] border border-purple-500/40 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200">Available</span>
+          <div className="absolute bottom-2 right-2 bg-white dark:bg-[#07051a] border border-gray-200 dark:border-white/10 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
+            <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200">Open to Work</span>
           </div>
         </div>
 
         {/* Greeting Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-500/40 text-purple-700 dark:text-purple-200 text-xs sm:text-sm font-semibold mb-4 backdrop-blur-md shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-[#8245ec] dark:text-[#e879f9]" />
-          <span>Halo, Saya</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium mb-4 backdrop-blur-md shadow-sm">
+          <span>👋</span>
+          <span>Halo, perkenalkan saya</span>
         </div>
 
         {/* Name */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-heading tracking-tight mb-3">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] via-[#c026d3] to-[#0284c7] dark:from-[#a78bfa] dark:via-[#e879f9] dark:to-[#38bdf8] animate-gradient-x">
-            {name}
-          </span>
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold font-heading tracking-tight mb-3 text-gray-900 dark:text-white">
+          {name}
         </h1>
 
         {/* Roles with Typewriter Effect */}

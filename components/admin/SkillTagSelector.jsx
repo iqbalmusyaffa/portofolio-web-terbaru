@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Code, Check, Sparkles } from 'lucide-react';
+import { Code, Check, Tag } from 'lucide-react';
 import { iconMap, defaultSkillIconMap, isImageIcon } from '@/lib/constants/skills';
 
 export default function SkillTagSelector({
@@ -101,7 +101,7 @@ export default function SkillTagSelector({
       <div className="p-3 bg-[#120e2e] rounded-xl border border-purple-500/20 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-purple-300 flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-purple-400" />
+            <Tag className="w-3 h-3 text-purple-400" />
             <span>Pilih cepat dari daftar Skills (klik untuk tambah/hapus):</span>
           </span>
           {loading && (

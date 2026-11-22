@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ExternalLink, Github, Sparkles, Info, X } from 'lucide-react';
+import { ExternalLink, Github, Star, Info, X } from 'lucide-react';
 
 export default function Projects({ projects }) {
   const [activeFilter, setActiveFilter] = useState('Semua');
@@ -58,11 +58,13 @@ export default function Projects({ projects }) {
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] via-[#c026d3] to-[#0284c7] dark:from-[#a78bfa] dark:via-[#e879f9] dark:to-[#38bdf8]">
-            PROJECTS
+          <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
+            Portofolio Karya
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
+            Proyek Pilihan & Rekayasa Web
           </h2>
-          <div className="w-20 h-1 bg-[#8245ec] mx-auto mt-3 rounded-full" />
-          <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Karya dan proyek aplikasi nyata yang telah saya rancang dan kembangkan dengan standar arsitektur modern.
           </p>
         </div>
@@ -115,8 +117,8 @@ export default function Projects({ projects }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-[#050414] via-transparent to-transparent" />
 
                   {project.featured ? (
-                    <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-purple-100 bg-purple-950/80 border border-purple-400/50 backdrop-blur-md flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-[#e879f9]" />
+                    <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide text-amber-200 bg-black/70 border border-amber-500/40 backdrop-blur-md flex items-center gap-1 shadow-sm">
+                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                       Featured
                     </span>
                   ) : null}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { iconMap, defaultSkillIconMap, isImageIcon } from '@/lib/constants/skills';
 
 // Re-export constants for backwards compatibility
@@ -20,13 +20,15 @@ export default function Skills({ skills }) {
     <section id="skills" className="py-20 px-4 relative z-10">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] via-[#c026d3] to-[#7c3aed] dark:from-[#a78bfa] dark:via-[#e879f9] dark:to-[#a78bfa] animate-gradient-x">
-            SKILLS
+        <div className="text-center mb-14">
+          <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
+            Keahlian Teknis
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
+            Tech Stack & Kemampuan
           </h2>
-          <div className="w-20 h-1 bg-[#8245ec] mx-auto mt-3 rounded-full" />
-          <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm sm:text-base max-w-2xl mx-auto">
-            A collection of my technical skills and expertise honed through various projects and experiences
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            Kumpulan teknologi, bahasa pemrograman, dan alat bantu pengembangan yang saya kuasai dan gunakan dalam proyek nyata.
           </p>
         </div>
 

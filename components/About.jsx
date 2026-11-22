@@ -33,12 +33,14 @@ export default function About({ profile, projectCount, certCount, expCount }) {
     <section id="about" className="py-20 px-4 relative z-10">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] via-[#c026d3] to-[#0284c7] dark:from-[#a78bfa] dark:via-[#e879f9] dark:to-[#38bdf8]">
-            ABOUT ME
+        <div className="text-center mb-14">
+          <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-purple-600 dark:text-purple-400 mb-2">
+            Tentang Saya
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-gray-900 dark:text-white">
+            Dedikasi & Latar Belakang
           </h2>
-          <div className="w-20 h-1 bg-[#8245ec] mx-auto mt-3 rounded-full" />
-          <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Mengenal lebih dekat latar belakang, keahlian, dan komitmen profesional saya dalam rekayasa perangkat lunak.
           </p>
         </div>
