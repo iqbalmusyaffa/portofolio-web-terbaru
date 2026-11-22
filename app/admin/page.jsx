@@ -58,7 +58,7 @@ export default function AdminPage() {
   const [toast, setToast] = useState({ message: '', type: '' });
 
   // Security Credentials states
-  const [credForm, setCredForm] = useState({ username: '', newPassword: '', confirmPassword: '' });
+  const [credForm, setCredForm] = useState({ username: '', email: '', newPassword: '', confirmPassword: '' });
   const [credLoading, setCredLoading] = useState(false);
 
   // File Upload state & handler
@@ -450,13 +450,14 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           new_username: credForm.username ? credForm.username.trim() : undefined,
+          new_email: credForm.email ? credForm.email.trim() : undefined,
           new_password: credForm.newPassword
         })
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Username & password admin berhasil diperbarui di database!', 'success');
-        setCredForm({ username: '', newPassword: '', confirmPassword: '' });
+        showToast('Kredensial login admin (username/email/password) berhasil diperbarui!', 'success');
+        setCredForm({ username: '', email: '', newPassword: '', confirmPassword: '' });
       } else {
         showToast(data.error || 'Gagal memperbarui kredensial', 'error');
       }
@@ -521,15 +522,15 @@ export default function AdminPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-200 mb-1.5">
-                Username
+                Username atau Email
               </label>
               <input
                 type="text"
                 required
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                placeholder="Masukkan username admin"
-                className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 focus:bg-[#1a1344] transition-all"
+                placeholder="Masukkan username atau email admin"
+                className="w-full px-4 py-3 rounded-xl bg-[#140f33] border border-purple-500/30 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-400 focus:bg-[#1a1344] transition-all font-mono"
               />
             </div>
 

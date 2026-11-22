@@ -37,6 +37,7 @@ export async function POST(request) {
     }
 
     const cleanUsername = username.trim();
+    const cleanIdentifier = cleanUsername.toLowerCase();
 
     await ensureDatabaseAndTables();
 
@@ -45,7 +46,19 @@ export async function POST(request) {
     let isPasswordCorrect = false;
 
     try {
-      const rows = await query('SELECT * FROM admins WHERE username = ? LIMIT 1', [cleanUsername]);
+      let rows = await query(
+        'SELECT * FROM admins WHERE LOWER(username) = ? OR LOWER(email) = ? LIMIT 1',
+        [cleanIdentifier, cleanIdentifier]
+      );
+
+      // Fallback: if user logged in with email, also check profile table email
+      if ((!rows || rows.length === 0) && cleanIdentifier.includes('@')) {
+        const profRows = await query('SELECT email FROM profile WHERE LOWER(email) = ? LIMIT 1', [cleanIdentifier]);
+        if (profRows && profRows.length > 0) {
+          rows = await query('SELECT * FROM admins LIMIT 1');
+        }
+      }
+
       if (rows && rows.length > 0) {
         const adminRecord = rows[0];
         isPasswordCorrect = verifyPassword(password, adminRecord.password_hash);
@@ -123,7 +136,7 @@ export async function PUT(request) {
   if (!auth.authenticated) return NextResponse.json(auth.response, { status: 401 });
 
   try {
-    const { new_username, new_password } = await request.json();
+    const { new_username, new_email, new_password } = await request.json();
     if (!new_password || typeof new_password !== 'string' || new_password.length < 6) {
       return NextResponse.json(
         { success: false, error: 'Password baru minimal harus 6 karakter' },
@@ -131,24 +144,34 @@ export async function PUT(request) {
       );
     }
 
-    const targetUser = new_username && typeof new_username === 'string' ? new_username.trim() : auth.user;
+    let targetUser = new_username && typeof new_username === 'string' && new_username.trim()
+      ? new_username.trim()
+      : auth.user;
+    let targetEmail = new_email && typeof new_email === 'string' && new_email.trim()
+      ? new_email.trim()
+      : null;
+
+    // If targetUser contains '@', it is an email address; auto-populate email as well
+    if (targetUser.includes('@') && !targetEmail) {
+      targetEmail = targetUser;
+    }
+
     const passwordHash = hashPassword(new_password);
 
     await ensureDatabaseAndTables();
 
-    // Check if user exists
-    const existing = await query('SELECT id FROM admins WHERE username = ?', [auth.user]);
+    // Check if admin exists
+    const existing = await query('SELECT id FROM admins WHERE username = ? OR id = 1 LIMIT 1', [auth.user]);
     if (existing && existing.length > 0) {
-      await query('UPDATE admins SET username = ?, password_hash = ? WHERE username = ?', [
-        targetUser,
-        passwordHash,
-        auth.user
-      ]);
+      await query(
+        'UPDATE admins SET username = ?, email = COALESCE(?, email), password_hash = ? WHERE id = ?',
+        [targetUser, targetEmail, passwordHash, existing[0].id]
+      );
     } else {
-      await query('INSERT INTO admins (username, password_hash) VALUES (?, ?)', [
-        targetUser,
-        passwordHash
-      ]);
+      await query(
+        'INSERT INTO admins (username, email, password_hash) VALUES (?, ?, ?)',
+        [targetUser, targetEmail, passwordHash]
+      );
     }
 
     // Refresh token with new username
