@@ -22,6 +22,15 @@ const PRESET_CITIES = [
   'Bogor'
 ];
 
+export function normalizeCityName(str) {
+  if (!str) return '';
+  let s = str.toLowerCase().trim();
+  if (s.includes('remote') || s.includes('wfh')) return 'remote';
+  if (s === 'jogja' || s === 'yogya' || s === 'yogyakarta') return 'yogyakarta';
+  if (s === 'dki jakarta' || s === 'jakarta') return 'jakarta';
+  return s.replace(/[^a-z0-9]/g, '');
+}
+
 export default function CityTagSelector({
   value = '',
   onChange
@@ -36,18 +45,31 @@ export default function CityTagSelector({
 
   const isSelected = (city) => {
     const target = city.trim().toLowerCase();
-    return currentTokens.some((t) => t.toLowerCase() === target);
+    const norm = normalizeCityName(city);
+    return currentTokens.some((t) => {
+      return (
+        t.toLowerCase() === target ||
+        (norm && normalizeCityName(t) === norm)
+      );
+    });
   };
 
   const handleToggle = (cityName) => {
     const trimmed = cityName.trim();
     if (!trimmed) return;
     const target = trimmed.toLowerCase();
-    const exists = currentTokens.some((t) => t.toLowerCase() === target);
+    const norm = normalizeCityName(trimmed);
+
+    const existsIndex = currentTokens.findIndex((t) => {
+      return (
+        t.toLowerCase() === target ||
+        (norm && normalizeCityName(t) === norm)
+      );
+    });
 
     let nextTokens;
-    if (exists) {
-      nextTokens = currentTokens.filter((t) => t.toLowerCase() !== target);
+    if (existsIndex >= 0) {
+      nextTokens = currentTokens.filter((_, idx) => idx !== existsIndex);
     } else {
       nextTokens = [...currentTokens, trimmed];
     }

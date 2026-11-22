@@ -1,8 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Code, Check, Tag } from 'lucide-react';
 import { iconMap, defaultSkillIconMap, isImageIcon } from '@/lib/constants/skills';
+
+/**
+ * Normalisasi nama teknologi agar variasi ejaan cocok satu sama lain:
+ * Contoh:
+ * - 'React', 'React.js', 'React JS', 'Reactjs' -> 'react'
+ * - 'Next.js', 'Next JS', 'Nextjs', 'Next' -> 'next'
+ * - 'Node.js', 'Node JS', 'Nodejs', 'Node' -> 'node'
+ * - 'Tailwind CSS', 'Tailwind', 'Tailwindcss' -> 'tailwind'
+ * - 'Express JS', 'Express.js', 'Express' -> 'express'
+ */
+export function normalizeTechName(str) {
+  if (!str) return '';
+  let s = str.toLowerCase().trim();
+
+  // Special cases
+  if (s === 'js' || s === 'javascript') return 'javascript';
+  if (s === 'ts' || s === 'typescript') return 'typescript';
+
+  // Normalize common suffixes
+  s = s
+    .replace(/(\.|\s+)js$/i, '')
+    .replace(/(\.|\s+)css$/i, '');
+
+  if (s === 'reactjs') s = 'react';
+  if (s === 'nextjs') s = 'next';
+  if (s === 'nodejs') s = 'node';
+  if (s === 'expressjs') s = 'express';
+  if (s === 'vuejs') s = 'vue';
+  if (s === 'tailwindcss') s = 'tailwind';
+
+  return s.replace(/[^a-z0-9]/g, '');
+}
 
 export default function SkillTagSelector({
   label = 'Teknologi yang Digunakan (koma)',
@@ -40,22 +72,34 @@ export default function SkillTagSelector({
     .map((s) => s.trim())
     .filter(Boolean);
 
+  // Smart matching: Cocokkan token baik secara langsung maupun melalui nama yang dinormalisasi
   const isSelected = (skillName) => {
-    const target = skillName.trim().toLowerCase();
-    return currentTokens.some((t) => t.toLowerCase() === target);
+    const normTarget = normalizeTechName(skillName);
+    return currentTokens.some((t) => {
+      return (
+        t.toLowerCase() === skillName.toLowerCase() ||
+        (normTarget && normalizeTechName(t) === normTarget)
+      );
+    });
   };
 
   const handleToggle = (skillName) => {
     const trimmedName = skillName.trim();
-    const target = trimmedName.toLowerCase();
-    const exists = currentTokens.some((t) => t.toLowerCase() === target);
+    const normTarget = normalizeTechName(trimmedName);
+
+    const existingIndex = currentTokens.findIndex((t) => {
+      return (
+        t.toLowerCase() === trimmedName.toLowerCase() ||
+        (normTarget && normalizeTechName(t) === normTarget)
+      );
+    });
 
     let nextTokens;
-    if (exists) {
-      // Remove token
-      nextTokens = currentTokens.filter((t) => t.toLowerCase() !== target);
+    if (existingIndex >= 0) {
+      // Hapus token yang cocok (baik nama persis maupun variasinya seperti React / React JS)
+      nextTokens = currentTokens.filter((_, idx) => idx !== existingIndex);
     } else {
-      // Append token
+      // Tambahkan nama skill baru ke daftar
       nextTokens = [...currentTokens, trimmedName];
     }
 
@@ -63,6 +107,20 @@ export default function SkillTagSelector({
       onChange(nextTokens.join(', '));
     }
   };
+
+  // Deduplikasi tampilan pills agar skill dengan nama sama (cth: JavaScript di frontend & languages) tidak dobel
+  const displayedSkills = useMemo(() => {
+    const seen = new Set();
+    const unique = [];
+    for (const item of skillList) {
+      const norm = normalizeTechName(item.name) || item.name.toLowerCase();
+      if (!seen.has(norm)) {
+        seen.add(norm);
+        unique.push(item);
+      }
+    }
+    return unique;
+  }, [skillList]);
 
   const renderIcon = (skill) => {
     if (skill.icon && isImageIcon(skill.icon)) {
@@ -94,7 +152,7 @@ export default function SkillTagSelector({
         value={value}
         onChange={(e) => onChange && onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 placeholder-gray-500 transition-all"
+        className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 placeholder-gray-500 transition-all font-mono"
       />
 
       {/* Quick Select from Skills API */}
@@ -111,13 +169,13 @@ export default function SkillTagSelector({
           )}
         </div>
 
-        {skillList.length === 0 && !loading ? (
+        {displayedSkills.length === 0 && !loading ? (
           <p className="text-[11px] text-gray-400 italic">
             Belum ada data skill di database. Anda bisa menambahkannya di tab Skills.
           </p>
         ) : (
           <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-purple-900/40">
-            {skillList.map((skill) => {
+            {displayedSkills.map((skill) => {
               const selected = isSelected(skill.name);
               return (
                 <button
