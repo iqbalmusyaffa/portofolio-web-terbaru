@@ -18,6 +18,8 @@ export default function AiAssistantModal({
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
+  const [isAuthError, setIsAuthError] = useState(false);
+
   if (!isOpen) return null;
 
   const handleRunAi = async () => {
@@ -28,6 +30,7 @@ export default function AiAssistantModal({
 
     setLoading(true);
     setError('');
+    setIsAuthError(false);
     setResultText('');
 
     try {
@@ -46,7 +49,12 @@ export default function AiAssistantModal({
       if (data.success) {
         setResultText(data.result);
       } else {
-        setError(data.error || 'Gagal memproses AI');
+        if (res.status === 401 || data.isAuthError || (data.error && data.error.includes('Sesi login'))) {
+          setIsAuthError(true);
+          setError(data.error || 'Sesi login telah kedaluwarsa. Silakan login kembali.');
+        } else {
+          setError(data.error || 'Gagal memproses AI');
+        }
       }
     } catch (err) {
       setError('Gagal menghubungi server AI. Pastikan koneksi internet stabil.');
@@ -185,9 +193,21 @@ export default function AiAssistantModal({
 
           {/* Error Notice */}
           {error && (
-            <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{error}</div>
+            <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-200 text-xs flex flex-col gap-2">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <div className="leading-relaxed flex-1">{error}</div>
+              </div>
+              {isAuthError && (
+                <div className="pt-2 border-t border-rose-500/30 flex items-center justify-end">
+                  <a
+                    href="/admin/login"
+                    className="px-3 py-1.5 rounded-lg bg-rose-700/80 hover:bg-rose-600 text-white font-semibold text-[11px] transition-colors"
+                  >
+                    Login Ulang Sekarang →
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

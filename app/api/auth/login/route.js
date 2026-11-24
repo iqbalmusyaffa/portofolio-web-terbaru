@@ -10,6 +10,8 @@ import {
 } from '@/lib/security';
 import { query, ensureDatabaseAndTables } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
