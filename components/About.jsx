@@ -4,7 +4,7 @@ import { Code2, Award, Briefcase, GraduationCap, CheckCircle2 } from 'lucide-rea
 import { useLanguage } from './LanguageProvider';
 
 export default function About({ profile, projectCount, certCount, expCount }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const stats = [
     { label: t('about.stats.projects'), value: `${projectCount || 6}+`, icon: Code2, desc: t('about.stats.projects_sub') },
@@ -79,10 +79,10 @@ export default function About({ profile, projectCount, certCount, expCount }) {
           <div className="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-lg dark:shadow-none">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-heading mb-4 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#8245ec]" />
-              {profile?.about_title || 'Dedikasi untuk Solusi Digital Berkualitas'}
+              {(language === 'en' && profile?.about_title_en) ? profile.about_title_en : (profile?.about_title || 'Dedikasi untuk Solusi Digital Berkualitas')}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              {profile?.bio || 'Saya adalah lulusan S1 Sistem Informasi Universitas Telkom Surabaya yang memiliki passion mendalam pada perancangan dan pembangunan aplikasi web yang scalable, responsif, dan mudah digunakan.'}
+              {(language === 'en' && profile?.bio_en) ? profile.bio_en : (profile?.bio || 'Saya adalah lulusan S1 Sistem Informasi Universitas Telkom Surabaya yang memiliki passion mendalam pada perancangan dan pembangunan aplikasi web yang scalable, responsif, dan mudah digunakan.')}
             </p>
             {profile?.about_bio_2 && (
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed mb-6">

@@ -4,7 +4,7 @@ import { Calendar, MapPin, Building2 } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
 
 export default function Experience({ experiences }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <section id="experience" className="py-20 px-4 relative z-10">
@@ -45,7 +45,7 @@ export default function Experience({ experiences }) {
                 <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 group-hover:border-purple-400 dark:group-hover:border-purple-500/40 transition-all duration-300 shadow-md dark:shadow-xl dark:shadow-black/30">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                     <h3 className="text-lg sm:text-xl font-bold font-heading text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-[#a78bfa] transition-colors">
-                      {exp.role}
+                      {(language === 'en' && exp.role_en) ? exp.role_en : exp.role}
                     </h3>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-500/30 shrink-0 w-fit">
                       <Calendar className="w-3.5 h-3.5" />
@@ -64,7 +64,7 @@ export default function Experience({ experiences }) {
                   </div>
 
                   <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5">
-                    {exp.description}
+                    {(language === 'en' && exp.description_en) ? exp.description_en : exp.description}
                   </p>
 
                   {/* Tech stack tags */}

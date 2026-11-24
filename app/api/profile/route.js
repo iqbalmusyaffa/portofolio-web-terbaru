@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString } from '@/lib/security';
 
+export const dynamic = 'force-dynamic';
+
 // GET Profile: Public
 export async function GET() {
   try {
@@ -44,6 +46,7 @@ export async function PUT(request) {
 
       // About Section Fields
       about_title,
+      about_title_en,
       about_bio_2,
       about_highlights,
       availability_status,
@@ -52,6 +55,7 @@ export async function PUT(request) {
       code_philosophy_title,
       code_philosophy_desc,
       gpa_score,
+      bio_en,
 
       // SEO & OpenGraph Fields
       meta_title,
@@ -79,6 +83,8 @@ export async function PUT(request) {
 
     // About sanitization
     const cleanAboutTitle = sanitizeString(about_title || 'Dedikasi untuk Solusi Digital Berkualitas', 255);
+    const cleanAboutTitleEn = sanitizeString(about_title_en || 'Dedication to High-Impact Digital Solutions', 255);
+    const cleanBioEn = sanitizeString(bio_en || '', 3000);
     const cleanAboutBio2 = sanitizeString(about_bio_2 || '', 3000);
     let highlightsStr = '[]';
     if (Array.isArray(about_highlights)) {
@@ -114,19 +120,19 @@ export async function PUT(request) {
     if (existing && existing.length > 0) {
       await query(
         `UPDATE profile SET 
-          name = ?, full_name = ?, tagline = ?, roles = ?, bio = ?, avatar_url = ?, 
+          name = ?, full_name = ?, tagline = ?, roles = ?, bio = ?, bio_en = ?, avatar_url = ?, 
           cv_url = ?, cv_pdf_url = ?, github_url = ?, linkedin_url = ?, instagram_url = ?, facebook_url = ?, 
           email = ?, location = ?,
-          about_title = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?, relocation_cities = ?,
+          about_title = ?, about_title_en = ?, about_bio_2 = ?, about_highlights = ?, availability_status = ?, relocation_cities = ?,
           code_philosophy_label = ?, code_philosophy_title = ?, code_philosophy_desc = ?, gpa_score = ?,
           meta_title = ?, meta_description = ?, meta_keywords = ?, og_image = ?,
           canonical_url = ?, google_site_verification = ?
          WHERE id = ?`,
         [
-          cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanAvatar,
+          cleanName, cleanFullName, cleanTagline, rolesStr, cleanBio, cleanBioEn, cleanAvatar,
           cleanCv, cleanCvPdf, cleanGithub, cleanLinkedin, cleanInstagram, cleanFacebook,
           cleanEmail, cleanLocation,
-          cleanAboutTitle, cleanAboutBio2, highlightsStr, cleanAvailability, cleanRelocationCities,
+          cleanAboutTitle, cleanAboutTitleEn, cleanAboutBio2, highlightsStr, cleanAvailability, cleanRelocationCities,
           cleanPhilLabel, cleanPhilTitle, cleanPhilDesc, cleanGpa,
           cleanMetaTitle, cleanMetaDesc, cleanMetaKeywords, cleanOgImage,
           cleanCanonical, cleanGVerify, existing[0].id

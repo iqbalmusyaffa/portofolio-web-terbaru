@@ -3,6 +3,8 @@ import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     await ensureDatabaseAndTables();
@@ -23,14 +25,16 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { title, description, live_url, github_url, image_url, tags, featured = 0 } = body;
+    const { title, title_en, description, description_en, live_url, github_url, image_url, tags, featured = 0 } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return errorResponse('Judul proyek wajib diisi', 400);
     }
 
     const cleanTitle = sanitizeString(title, 200);
+    const cleanTitleEn = sanitizeString(title_en || '', 200);
     const cleanDesc = sanitizeString(description || '', 3000);
+    const cleanDescEn = sanitizeString(description_en || '', 3000);
     const cleanLiveUrl = sanitizeString(live_url || '', 500);
     const cleanGithubUrl = sanitizeString(github_url || '', 500);
     const cleanImageUrl = sanitizeString(image_url || '', 500);
@@ -38,14 +42,16 @@ export async function POST(request) {
 
     await ensureDatabaseAndTables();
     const result = await query(
-      'INSERT INTO projects (title, description, live_url, github_url, image_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [cleanTitle, cleanDesc, cleanLiveUrl, cleanGithubUrl, cleanImageUrl, tagsStr, featured ? 1 : 0]
+      'INSERT INTO projects (title, title_en, description, description_en, live_url, github_url, image_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [cleanTitle, cleanTitleEn, cleanDesc, cleanDescEn, cleanLiveUrl, cleanGithubUrl, cleanImageUrl, tagsStr, featured ? 1 : 0]
     );
 
     const newProj = {
       id: result?.insertId || Date.now(),
       title: cleanTitle,
+      title_en: cleanTitleEn,
       description: cleanDesc,
+      description_en: cleanDescEn,
       live_url: cleanLiveUrl,
       github_url: cleanGithubUrl,
       image_url: cleanImageUrl,
@@ -68,14 +74,16 @@ export async function PUT(request) {
   try {
     const body = await request.json();
     const id = parseValidId(body.id);
-    const { title, description, live_url, github_url, image_url, tags, featured = 0 } = body;
+    const { title, title_en, description, description_en, live_url, github_url, image_url, tags, featured = 0 } = body;
 
     if (!id || !title) {
       return errorResponse('ID dan judul proyek wajib diisi', 400);
     }
 
     const cleanTitle = sanitizeString(title, 200);
+    const cleanTitleEn = sanitizeString(title_en || '', 200);
     const cleanDesc = sanitizeString(description || '', 3000);
+    const cleanDescEn = sanitizeString(description_en || '', 3000);
     const cleanLiveUrl = sanitizeString(live_url || '', 500);
     const cleanGithubUrl = sanitizeString(github_url || '', 500);
     const cleanImageUrl = sanitizeString(image_url || '', 500);
@@ -83,14 +91,14 @@ export async function PUT(request) {
 
     await ensureDatabaseAndTables();
     await query(
-      'UPDATE projects SET title = ?, description = ?, live_url = ?, github_url = ?, image_url = ?, tags = ?, featured = ? WHERE id = ?',
-      [cleanTitle, cleanDesc, cleanLiveUrl, cleanGithubUrl, cleanImageUrl, tagsStr, featured ? 1 : 0, id]
+      'UPDATE projects SET title = ?, title_en = ?, description = ?, description_en = ?, live_url = ?, github_url = ?, image_url = ?, tags = ?, featured = ? WHERE id = ?',
+      [cleanTitle, cleanTitleEn, cleanDesc, cleanDescEn, cleanLiveUrl, cleanGithubUrl, cleanImageUrl, tagsStr, featured ? 1 : 0, id]
     );
 
     const list = getFallbackData().projects;
     const idx = list.findIndex(p => p.id === id);
     if (idx !== -1) {
-      list[idx] = { id, title: cleanTitle, description: cleanDesc, live_url: cleanLiveUrl, github_url: cleanGithubUrl, image_url: cleanImageUrl, tags: tagsStr, featured: featured ? 1 : 0 };
+      list[idx] = { id, title: cleanTitle, title_en: cleanTitleEn, description: cleanDesc, description_en: cleanDescEn, live_url: cleanLiveUrl, github_url: cleanGithubUrl, image_url: cleanImageUrl, tags: tagsStr, featured: featured ? 1 : 0 };
     }
 
     return successResponse(null, 200, 'Proyek berhasil diperbarui');

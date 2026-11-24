@@ -53,7 +53,7 @@ export default function Hero({ profile }) {
   }, [currentText, isDeleting, currentWordIdx, roles]);
 
   const name = profile?.name || "Iqbal Musyaffa";
-  const bio = profile?.bio || "Lulusan Universitas Telkom Surabaya yang senang menerjemahkan ide menjadi antarmuka web yang bersih dan efisien. Berpengalaman membangun aplikasi dengan ekosistem Laravel & React. Fokus utama saya bukan sekadar menulis kode, tapi memberikan dampak nyata bagi pengguna dan tim.";
+  const bio = (language === 'en' && profile?.bio_en) ? profile.bio_en : (profile?.bio || "Lulusan Universitas Telkom Surabaya yang senang menerjemahkan ide menjadi antarmuka web yang bersih dan efisien. Berpengalaman membangun aplikasi dengan ekosistem Laravel & React. Fokus utama saya bukan sekadar menulis kode, tapi memberikan dampak nyata bagi pengguna dan tim.");
   const cvUrl = profile?.cv_url || "https://drive.google.com/drive/folders/1Pot8GeUM6s_4J7n_8VlcULaMaycx1sD4?usp=sharing";
   const cvPdfUrl = profile?.cv_pdf_url || "/cv-iqbal-musyaffa.pdf";
   const avatarUrl = profile?.avatar_url || "/foto2.jpg";

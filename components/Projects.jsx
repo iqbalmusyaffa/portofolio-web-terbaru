@@ -5,7 +5,7 @@ import { ExternalLink, Github, Star, Info, X } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
 
 export default function Projects({ projects }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('Semua');
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -130,10 +130,10 @@ export default function Projects({ projects }) {
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="text-lg font-bold font-heading text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-[#a78bfa] transition-colors mb-2 line-clamp-1">
-                      {project.title}
+                      {(language === 'en' && project.title_en) ? project.title_en : project.title}
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">
-                      {project.description}
+                      {(language === 'en' && project.description_en) ? project.description_en : project.description}
                     </p>
                   </div>
 
@@ -233,10 +233,10 @@ export default function Projects({ projects }) {
             </div>
 
             <h3 className="text-xl sm:text-2xl font-bold font-heading text-gray-900 dark:text-white mb-2 pr-8">
-              {selectedProject.title}
+              {(language === 'en' && selectedProject.title_en) ? selectedProject.title_en : selectedProject.title}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-              {selectedProject.description}
+              {(language === 'en' && selectedProject.description_en) ? selectedProject.description_en : selectedProject.description}
             </p>
 
             <div className="flex flex-wrap gap-3">
