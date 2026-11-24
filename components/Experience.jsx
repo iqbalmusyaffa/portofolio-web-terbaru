@@ -2,6 +2,7 @@
 
 import { Calendar, MapPin, Building2 } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
+import { cleanTagsList } from '@/lib/tagUtils';
 
 export default function Experience({ experiences }) {
   const { t, language } = useLanguage();
@@ -25,14 +26,7 @@ export default function Experience({ experiences }) {
         {/* Timeline Container */}
         <div className="relative pl-6 sm:pl-8 border-l-2 border-purple-300 dark:border-purple-900/50 space-y-12">
           {(experiences || []).map((exp, index) => {
-            let techList = [];
-            if (exp.technologies) {
-              try {
-                techList = typeof exp.technologies === 'string' ? JSON.parse(exp.technologies) : exp.technologies;
-              } catch (e) {
-                techList = exp.technologies.split(',').map((t) => t.trim());
-              }
-            }
+            const techList = cleanTagsList(exp.technologies);
 
             return (
               <div key={exp.id || index} className="relative group">

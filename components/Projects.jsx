@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Github, Star, Info, X } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
+import { cleanTagsList } from '@/lib/tagUtils';
 
 export default function Projects({ projects }) {
   const { t, language } = useLanguage();
@@ -31,13 +32,7 @@ export default function Projects({ projects }) {
   const filteredProjects = (projects || []).filter((p) => {
     if (activeFilter === 'Semua') return true;
     
-    let tags = [];
-    try {
-      tags = typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags;
-    } catch (e) {
-      tags = (p.tags || '').split(',').map((t) => t.trim());
-    }
-
+    const tags = cleanTagsList(p.tags);
     const tagsJoined = tags.join(' ').toLowerCase();
     const titleAndDesc = `${p.title} ${p.description}`.toLowerCase();
     
@@ -91,14 +86,7 @@ export default function Projects({ projects }) {
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => {
-            let tags = [];
-            if (project.tags) {
-              try {
-                tags = typeof project.tags === 'string' ? JSON.parse(project.tags) : project.tags;
-              } catch (e) {
-                tags = project.tags.split(',').map((t) => t.trim());
-              }
-            }
+            const tags = cleanTagsList(project.tags);
 
             return (
               <div

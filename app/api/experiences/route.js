@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
+import { cleanTagsToString } from '@/lib/tagUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ export async function POST(request) {
     const cleanDesc = sanitizeString(description || '', 3000);
     const cleanDescEn = sanitizeString(description_en || '', 3000);
     const cleanLoc = sanitizeString(location || '', 100);
-    const techStr = typeof technologies === 'string' ? sanitizeString(technologies, 500) : JSON.stringify(technologies || []);
+    const techStr = cleanTagsToString(technologies);
 
     await ensureDatabaseAndTables();
     const result = await query(
@@ -77,7 +78,7 @@ export async function PUT(request) {
     const cleanDesc = sanitizeString(description || '', 3000);
     const cleanDescEn = sanitizeString(description_en || '', 3000);
     const cleanLoc = sanitizeString(location || '', 100);
-    const techStr = typeof technologies === 'string' ? sanitizeString(technologies, 500) : JSON.stringify(technologies || []);
+    const techStr = cleanTagsToString(technologies);
 
     await ensureDatabaseAndTables();
     await query(

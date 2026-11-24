@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Code, Check, Tag } from 'lucide-react';
 import { iconMap, defaultSkillIconMap, isImageIcon } from '@/lib/constants/skills';
+import { cleanTagsList, cleanTagsToString } from '@/lib/tagUtils';
 
 /**
  * Normalisasi nama teknologi agar variasi ejaan cocok satu sama lain:
@@ -66,11 +67,9 @@ export default function SkillTagSelector({
     }
   }, [skills]);
 
-  // Parse comma-separated string into an array of trimmed tokens
-  const currentTokens = (typeof value === 'string' ? value : '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // Parse comma-separated or legacy JSON string into an array of clean trimmed tokens
+  const currentTokens = cleanTagsList(value);
+  const displayValue = cleanTagsToString(value);
 
   // Smart matching: Cocokkan token baik secara langsung maupun melalui nama yang dinormalisasi
   const isSelected = (skillName) => {
@@ -149,7 +148,7 @@ export default function SkillTagSelector({
       {/* Manual Input Field */}
       <input
         type="text"
-        value={value}
+        value={displayValue}
         onChange={(e) => onChange && onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400 placeholder-gray-500 transition-all font-mono"

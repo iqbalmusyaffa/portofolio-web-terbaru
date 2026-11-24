@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
+import { cleanTagsToString } from '@/lib/tagUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ export async function POST(request) {
     const cleanLiveUrl = sanitizeString(live_url || '', 500);
     const cleanGithubUrl = sanitizeString(github_url || '', 500);
     const cleanImageUrl = sanitizeString(image_url || '', 500);
-    const tagsStr = typeof tags === 'string' ? sanitizeString(tags, 500) : JSON.stringify(tags || []);
+    const tagsStr = cleanTagsToString(tags);
 
     await ensureDatabaseAndTables();
     const result = await query(
@@ -87,7 +88,7 @@ export async function PUT(request) {
     const cleanLiveUrl = sanitizeString(live_url || '', 500);
     const cleanGithubUrl = sanitizeString(github_url || '', 500);
     const cleanImageUrl = sanitizeString(image_url || '', 500);
-    const tagsStr = typeof tags === 'string' ? sanitizeString(tags, 500) : JSON.stringify(tags || []);
+    const tagsStr = cleanTagsToString(tags);
 
     await ensureDatabaseAndTables();
     await query(

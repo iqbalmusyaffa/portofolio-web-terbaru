@@ -209,7 +209,7 @@ export default function ProjectForm({
         </div>
         <SkillTagSelector
           label="Tags (pisahkan dengan koma)"
-          value={typeof item.tags === 'string' ? item.tags : JSON.stringify(item.tags || [])}
+          value={item.tags || ''}
           onChange={(val) => setItem({ ...item, tags: val })}
           skills={skills}
           placeholder="Next.js, React, Tailwind, MySQL"

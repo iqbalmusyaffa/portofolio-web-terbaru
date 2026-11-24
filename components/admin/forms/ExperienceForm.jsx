@@ -196,7 +196,7 @@ export default function ExperienceForm({
 
         <SkillTagSelector
           label="Teknologi yang Digunakan (koma)"
-          value={typeof item.technologies === 'string' ? item.technologies : JSON.stringify(item.technologies || [])}
+          value={item.technologies || ''}
           onChange={(val) => setItem({ ...item, technologies: val })}
           skills={skills}
           placeholder="HTML, CSS, JavaScript, Laravel, MySQL"
