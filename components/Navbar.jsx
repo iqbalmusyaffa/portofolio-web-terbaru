@@ -19,7 +19,7 @@ export default function Navbar() {
       setScrolled(window.scrollY > 20);
 
       // Section scroll spy
-      const sections = ['about', 'skills', 'experience', 'education', 'projects', 'certifications', 'contact'];
+      const sections = ['about', 'skills', 'experience', 'education', 'projects', 'blog', 'certifications', 'contact'];
       const scrollPosition = window.scrollY + 200;
 
       for (const sectionId of sections) {
@@ -45,6 +45,7 @@ export default function Navbar() {
     { name: t('nav.experience'), id: 'experience', href: '#experience' },
     { name: t('nav.education'), id: 'education', href: '#education' },
     { name: t('nav.projects'), id: 'projects', href: '#projects' },
+    { name: t('nav.blog'), id: 'blog', href: '#blog' },
     { name: t('nav.certifications'), id: 'certifications', href: '#certifications' },
     { name: t('nav.contact'), id: 'contact', href: '#contact' },
   ];

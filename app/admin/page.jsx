@@ -16,6 +16,7 @@ import Modal from '@/components/admin/Modal';
 
 // Form Components
 import ProjectForm from '@/components/admin/forms/ProjectForm';
+import BlogForm from '@/components/admin/forms/BlogForm';
 import SkillForm from '@/components/admin/forms/SkillForm';
 import ExperienceForm from '@/components/admin/forms/ExperienceForm';
 import EducationForm from '@/components/admin/forms/EducationForm';
@@ -23,6 +24,7 @@ import CertificateForm from '@/components/admin/forms/CertificateForm';
 
 // Tab Components
 import ProjectsTab from '@/components/admin/tabs/ProjectsTab';
+import BlogTab from '@/components/admin/tabs/BlogTab';
 import SkillsTab from '@/components/admin/tabs/SkillsTab';
 import ExperienceTab from '@/components/admin/tabs/ExperienceTab';
 import EducationTab from '@/components/admin/tabs/EducationTab';
@@ -45,6 +47,7 @@ export default function AdminPage() {
   // Data states
   const [profile, setProfile] = useState({});
   const [projects, setProjects] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [skills, setSkills] = useState([]);
   const [experiences, setExperiences] = useState([]);
   const [educations, setEducations] = useState([]);
@@ -151,9 +154,10 @@ export default function AdminPage() {
 
   const loadAllData = async () => {
     try {
-      const [pRes, prRes, sRes, eRes, edRes, cRes, mRes, dbRes] = await Promise.all([
+      const [pRes, prRes, blRes, sRes, eRes, edRes, cRes, mRes, dbRes] = await Promise.all([
         fetch('/api/profile').then((r) => r.json()),
         fetch('/api/projects').then((r) => r.json()),
+        fetch('/api/blogs').then((r) => r.json()),
         fetch('/api/skills').then((r) => r.json()),
         fetch('/api/experiences').then((r) => r.json()),
         fetch('/api/educations').then((r) => r.json()),
@@ -164,6 +168,7 @@ export default function AdminPage() {
 
       if (pRes?.data) setProfile(pRes.data);
       if (prRes?.data) setProjects(prRes.data);
+      if (blRes?.data) setBlogs(blRes.data);
       if (sRes?.data) setSkills(sRes.data);
       if (eRes?.data) setExperiences(eRes.data);
       if (edRes?.data) setEducations(edRes.data);
@@ -230,6 +235,46 @@ export default function AdminPage() {
       }
     } catch (e) {
       showToast('Gagal menghapus proyek', 'error');
+    }
+  };
+
+  // Blog CRUD
+  const saveBlog = async (e) => {
+    e.preventDefault();
+    const isEdit = !!editingItem.id;
+    try {
+      const res = await fetch('/api/blogs', {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingItem)
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Artikel blog berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`);
+        setModalType(null);
+        setEditingItem(null);
+        loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menyimpan artikel blog', 'error');
+      }
+    } catch (e) {
+      showToast('Gagal menyimpan artikel blog', 'error');
+    }
+  };
+
+  const deleteBlog = async (id) => {
+    if (!confirm('Hapus artikel blog ini?')) return;
+    try {
+      const res = await fetch(`/api/blogs?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Artikel blog berhasil dihapus');
+        loadAllData();
+      } else {
+        showToast(data.error || 'Gagal menghapus', 'error');
+      }
+    } catch (e) {
+      showToast('Gagal menghapus artikel blog', 'error');
     }
   };
 
@@ -471,6 +516,7 @@ export default function AdminPage() {
   // Label mapping for current tab breadcrumb
   const tabLabels = {
     projects: 'Proyek',
+    blogs: 'Blog & Artikel',
     skills: 'Skills',
     experience: 'Pengalaman',
     education: 'Pendidikan',
@@ -595,6 +641,7 @@ export default function AdminPage() {
         setSidebarOpen={setSidebarOpen}
         counts={{
           projects: projects.length,
+          blogs: blogs.length,
           skills: skills.length,
           experiences: experiences.length,
           educations: educations.length,
@@ -637,6 +684,36 @@ export default function AdminPage() {
                 setModalType('project');
               }}
               onDelete={deleteProject}
+            />
+          )}
+
+          {activeTab === 'blogs' && (
+            <BlogTab
+              blogs={blogs}
+              onAdd={() => {
+                setEditingItem({
+                  title: '',
+                  title_en: '',
+                  slug: '',
+                  summary: '',
+                  summary_en: '',
+                  content: '',
+                  content_en: '',
+                  category: 'Backend Architecture',
+                  tags: 'Next.js, MySQL, REST API',
+                  image_url: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=800&q=80',
+                  read_time: '5 min read',
+                  published_at: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+                  is_featured: 0,
+                  is_published: 1
+                });
+                setModalType('blog');
+              }}
+              onEdit={(blog) => {
+                setEditingItem({ ...blog });
+                setModalType('blog');
+              }}
+              onDelete={deleteBlog}
             />
           )}
 
@@ -768,6 +845,8 @@ export default function AdminPage() {
         title={`${editingItem?.id ? 'Edit' : 'Tambah'} ${
           modalType === 'project'
             ? 'Proyek'
+            : modalType === 'blog'
+            ? 'Artikel Blog'
             : modalType === 'skill'
             ? 'Skill'
             : modalType === 'experience'
@@ -790,6 +869,19 @@ export default function AdminPage() {
             setItem={setEditingItem}
             skills={skills}
             onSubmit={saveProject}
+            onClose={() => {
+              setModalType(null);
+              setEditingItem(null);
+            }}
+            onUploadFile={handleUploadFile}
+          />
+        )}
+
+        {modalType === 'blog' && editingItem && (
+          <BlogForm
+            item={editingItem}
+            setItem={setEditingItem}
+            onSubmit={saveBlog}
             onClose={() => {
               setModalType(null);
               setEditingItem(null);

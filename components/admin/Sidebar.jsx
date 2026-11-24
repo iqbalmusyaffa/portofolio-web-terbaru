@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {
   Shield,
   FolderGit2,
+  BookOpen,
   Zap,
   Briefcase,
   GraduationCap,
@@ -31,6 +32,7 @@ export default function Sidebar({
       group: 'KONTEN UTAMA',
       items: [
         { id: 'projects', label: 'Proyek', icon: FolderGit2, count: counts.projects },
+        { id: 'blogs', label: 'Blog & Artikel', icon: BookOpen, count: counts.blogs },
         { id: 'skills', label: 'Skills', icon: Zap, count: counts.skills },
         { id: 'experience', label: 'Pengalaman', icon: Briefcase, count: counts.experiences },
         { id: 'education', label: 'Pendidikan', icon: GraduationCap, count: counts.educations },

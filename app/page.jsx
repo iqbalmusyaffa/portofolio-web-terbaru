@@ -5,6 +5,7 @@ import Skills from '@/components/Skills';
 import Experience from '@/components/Experience';
 import Education from '@/components/Education';
 import Projects from '@/components/Projects';
+import Blog from '@/components/Blog';
 import Certifications from '@/components/Certifications';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
@@ -16,7 +17,8 @@ import {
   initialExperiences,
   initialEducations,
   initialProjects,
-  initialCertificates
+  initialCertificates,
+  initialBlogs
 } from '@/lib/initialData';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
 
@@ -26,13 +28,14 @@ async function getPortfolioData() {
   try {
     await ensureDatabaseAndTables();
 
-    const [profiles, skills, experiences, educations, projects, certificates] = await Promise.all([
+    const [profiles, skills, experiences, educations, projects, certificates, blogs] = await Promise.all([
       query('SELECT * FROM profile LIMIT 1').catch(() => []),
       query('SELECT * FROM skills ORDER BY category ASC, id ASC').catch(() => []),
       query('SELECT * FROM experiences ORDER BY id DESC').catch(() => []),
       query('SELECT * FROM educations ORDER BY id ASC').catch(() => []),
       query('SELECT * FROM projects ORDER BY featured DESC, id DESC').catch(() => []),
-      query('SELECT * FROM certificates ORDER BY id ASC').catch(() => [])
+      query('SELECT * FROM certificates ORDER BY id ASC').catch(() => []),
+      query('SELECT * FROM blogs ORDER BY is_featured DESC, id DESC').catch(() => [])
     ]);
 
     return {
@@ -41,7 +44,8 @@ async function getPortfolioData() {
       experiences: (experiences && experiences.length > 0) ? experiences : initialExperiences,
       educations: (educations && educations.length > 0) ? educations : initialEducations,
       projects: (projects && projects.length > 0) ? projects : initialProjects,
-      certificates: (certificates && certificates.length > 0) ? certificates : initialCertificates
+      certificates: (certificates && certificates.length > 0) ? certificates : initialCertificates,
+      blogs: (blogs && blogs.length > 0) ? blogs : initialBlogs
     };
   } catch (err) {
     console.error('Error loading data for page:', err);
@@ -52,7 +56,8 @@ async function getPortfolioData() {
       experiences: fallback.experiences || initialExperiences,
       educations: fallback.educations || initialEducations,
       projects: fallback.projects || initialProjects,
-      certificates: fallback.certificates || initialCertificates
+      certificates: fallback.certificates || initialCertificates,
+      blogs: fallback.blogs || initialBlogs
     };
   }
 }
@@ -151,6 +156,9 @@ export default async function HomePage() {
 
       {/* Projects Section */}
       <Projects projects={data.projects} />
+
+      {/* Blog Section */}
+      <Blog blogs={data.blogs} />
 
       {/* Certifications Section */}
       <Certifications certificates={data.certificates} />
