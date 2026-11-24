@@ -16,6 +16,50 @@ export default function ExperienceForm({
   const [aiTargetField, setAiTargetField] = useState('description');
   const [autoTranslating, setAutoTranslating] = useState(false);
   const [translateSuccess, setTranslateSuccess] = useState(false);
+  const [translatingRole, setTranslatingRole] = useState(false);
+  const [translateRoleSuccess, setTranslateRoleSuccess] = useState(false);
+
+  const handleAutoTranslateRole = async (direction = 'to_en') => {
+    const sourceText = direction === 'to_en' ? item.role : item.role_en;
+    const targetLang = direction === 'to_en' ? 'en' : 'id';
+
+    if (!sourceText || !sourceText.trim()) {
+      alert(direction === 'to_en' ? 'Isi Role / Posisi Bahasa Indonesia terlebih dahulu.' : 'Isi Role English terlebih dahulu.');
+      return;
+    }
+
+    setTranslatingRole(true);
+    setTranslateRoleSuccess(false);
+
+    try {
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'translate',
+          text: sourceText,
+          targetLang: targetLang
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.result) {
+        if (direction === 'to_en') {
+          setItem(prev => ({ ...prev, role_en: data.result }));
+        } else {
+          setItem(prev => ({ ...prev, role: data.result }));
+        }
+        setTranslateRoleSuccess(true);
+        setTimeout(() => setTranslateRoleSuccess(false), 3000);
+      } else {
+        alert(data.error || 'Gagal menerjemahkan role');
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan koneksi saat memanggil AI');
+    } finally {
+      setTranslatingRole(false);
+    }
+  };
 
   const handleAutoTranslateToEn = async () => {
     if (!item.description || !item.description.trim()) {
@@ -55,22 +99,72 @@ export default function ExperienceForm({
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0">
       <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#0f0b2a] border border-purple-900/40">
           <div>
-            <label className="block text-xs text-gray-300 mb-1">Role / Posisi (🇮🇩 ID)</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-purple-300">
+                🇮🇩 Role / Posisi (Bahasa Indonesia)
+              </label>
+              {item.role_en && !item.role && (
+                <button
+                  type="button"
+                  onClick={() => handleAutoTranslateRole('to_id')}
+                  disabled={translatingRole}
+                  className="text-[10px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <span>Ambil dari EN</span>
+                </button>
+              )}
+            </div>
             <input
               type="text"
               required
               value={item.role || ''}
               onChange={(e) => setItem({ ...item, role: e.target.value })}
+              placeholder="Contoh: Backend Developer"
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
             />
           </div>
+
           <div>
-            <label className="block text-xs text-gray-300 mb-1">Role / Posisi (🇬🇧 EN - Opsional)</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-emerald-300">
+                🇬🇧 Role / Posisi (English)
+              </label>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleAutoTranslateRole('to_en')}
+                  disabled={translatingRole || !item.role?.trim()}
+                  className="text-[10px] font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-2 py-0.5 rounded-md flex items-center gap-1 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
+                  title="Terjemahkan role ke English"
+                >
+                  {translatingRole ? (
+                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                  ) : translateRoleSuccess ? (
+                    <Check className="w-2.5 h-2.5 text-emerald-300" />
+                  ) : (
+                    <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+                  )}
+                  <span>{translateRoleSuccess ? 'Tersalin!' : 'Terjemahkan (AI)'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiTargetField('role_en');
+                    setAiModalOpen(true);
+                  }}
+                  className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-0.5 cursor-pointer"
+                  title="Bantuan AI untuk Role"
+                >
+                  <Bot className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
             <input
               type="text"
-              placeholder="Contoh: Full Stack Developer Intern"
+              placeholder="Contoh: Backend Developer Intern"
               value={item.role_en || ''}
               onChange={(e) => setItem({ ...item, role_en: e.target.value })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
@@ -223,15 +317,29 @@ export default function ExperienceForm({
       <AiAssistantModal
         isOpen={aiModalOpen}
         onClose={() => setAiModalOpen(false)}
-        initialText={aiTargetField === 'description_en' ? (item.description_en || item.description || '') : (item.description || '')}
+        initialText={
+          aiTargetField === 'role_en'
+            ? (item.role_en || item.role || '')
+            : aiTargetField === 'description_en'
+            ? (item.description_en || item.description || '')
+            : (item.description || '')
+        }
         onApply={(val) => {
-          if (aiTargetField === 'description_en') {
+          if (aiTargetField === 'role_en') {
+            setItem(prev => ({ ...prev, role_en: val }));
+          } else if (aiTargetField === 'description_en') {
             setItem(prev => ({ ...prev, description_en: val }));
           } else {
             setItem(prev => ({ ...prev, description: val }));
           }
         }}
-        title={aiTargetField === 'description_en' ? 'Asisten AI: Deskripsi English' : 'Asisten AI: Deskripsi Pengalaman (ID)'}
+        title={
+          aiTargetField === 'role_en'
+            ? 'Asisten AI: Role / Posisi (English)'
+            : aiTargetField === 'description_en'
+            ? 'Asisten AI: Deskripsi English'
+            : 'Asisten AI: Deskripsi Pengalaman (ID)'
+        }
       />
     </form>
   );

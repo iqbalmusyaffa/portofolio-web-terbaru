@@ -179,15 +179,61 @@ export default function ProfileTab({
             3. Konten Section About Me
           </h3>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-200 mb-1">Judul Utama About</label>
-            <input
-              type="text"
-              value={profile.about_title || ''}
-              onChange={(e) => setProfile({ ...profile, about_title: e.target.value })}
-              placeholder="Dedikasi untuk Solusi Digital Berkualitas"
-              className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-2xl bg-[#0f0b2a] border border-purple-900/40">
+            <div>
+              <label className="block text-xs font-semibold text-purple-300 mb-1">
+                🇮🇩 Judul Utama About (Bahasa Indonesia)
+              </label>
+              <input
+                type="text"
+                value={profile.about_title || ''}
+                onChange={(e) => setProfile({ ...profile, about_title: e.target.value })}
+                placeholder="Dedikasi untuk Solusi Digital Berkualitas"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-emerald-300">
+                  🇬🇧 Judul Utama About (English)
+                </label>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!profile.about_title) {
+                      alert('Isi Judul Utama About Bahasa Indonesia terlebih dahulu.');
+                      return;
+                    }
+                    try {
+                      const res = await fetch('/api/ai', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'translate', text: profile.about_title, targetLang: 'en' })
+                      });
+                      const d = await res.json();
+                      if (d.success && d.result) {
+                        setProfile(prev => ({ ...prev, about_title_en: d.result }));
+                      } else {
+                        alert(d.error || 'Gagal menerjemahkan judul about');
+                      }
+                    } catch (e) {
+                      alert('Gagal terhubung ke AI');
+                    }
+                  }}
+                  className="text-[10px] font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-2 py-0.5 rounded-md flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                >
+                  <Bot className="w-2.5 h-2.5" />
+                  <span>Terjemahkan (AI)</span>
+                </button>
+              </div>
+              <input
+                type="text"
+                value={profile.about_title_en || ''}
+                onChange={(e) => setProfile({ ...profile, about_title_en: e.target.value })}
+                placeholder="Dedication to High-Impact Digital Solutions"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#140f33] border border-purple-500/30 text-white text-sm focus:outline-none focus:border-purple-400"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
