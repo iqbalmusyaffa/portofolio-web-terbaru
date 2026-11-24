@@ -99,76 +99,79 @@ export default function ExperienceForm({
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0">
       <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-900/40">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#0f0b2a] border border-purple-900/40">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-purple-300">
-                🇮🇩 Role / Posisi (Bahasa Indonesia)
-              </label>
-              {item.role_en && !item.role && (
-                <button
-                  type="button"
-                  onClick={() => handleAutoTranslateRole('to_id')}
-                  disabled={translatingRole}
-                  className="text-[10px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer"
-                >
-                  <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>Ambil dari EN</span>
-                </button>
-              )}
+        {/* Role Bilingual */}
+        <div className="p-4 rounded-2xl bg-[#0f0b2a] border border-purple-900/40 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-purple-900/30 pb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500" />
+              <span className="text-xs font-bold text-white font-heading">Role / Posisi (Bilingual)</span>
             </div>
-            <input
-              type="text"
-              required
-              value={item.role || ''}
-              onChange={(e) => setItem({ ...item, role: e.target.value })}
-              placeholder="Contoh: Backend Developer"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-            />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleAutoTranslateRole('to_en')}
+                disabled={translatingRole || !item.role?.trim()}
+                className="text-[11px] font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
+                title="Terjemahkan role dari Bahasa Indonesia ke English"
+              >
+                {translatingRole ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Menerjemahkan...</span>
+                  </>
+                ) : translateRoleSuccess ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-300" />
+                    <span>Tersalin ke English!</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>Terjemahkan Role (Gemini AI)</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAiTargetField('role_en');
+                  setAiModalOpen(true);
+                }}
+                className="text-[11px] text-purple-400 hover:text-purple-300 p-1 rounded-lg hover:bg-purple-950/60 transition-colors cursor-pointer"
+                title="Bantuan AI untuk Role"
+              >
+                <Bot className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-emerald-300">
-                🇬🇧 Role / Posisi (English)
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label className="block text-xs font-semibold text-purple-300 mb-1.5">
+                🇮🇩 Versi Bahasa Indonesia
               </label>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleAutoTranslateRole('to_en')}
-                  disabled={translatingRole || !item.role?.trim()}
-                  className="text-[10px] font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-2 py-0.5 rounded-md flex items-center gap-1 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
-                  title="Terjemahkan role ke English"
-                >
-                  {translatingRole ? (
-                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
-                  ) : translateRoleSuccess ? (
-                    <Check className="w-2.5 h-2.5 text-emerald-300" />
-                  ) : (
-                    <Sparkles className="w-2.5 h-2.5 text-amber-300" />
-                  )}
-                  <span>{translateRoleSuccess ? 'Tersalin!' : 'Terjemahkan (AI)'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAiTargetField('role_en');
-                    setAiModalOpen(true);
-                  }}
-                  className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-0.5 cursor-pointer"
-                  title="Bantuan AI untuk Role"
-                >
-                  <Bot className="w-3 h-3" />
-                </button>
-              </div>
+              <input
+                type="text"
+                required
+                value={item.role || ''}
+                onChange={(e) => setItem({ ...item, role: e.target.value })}
+                placeholder="Contoh: Backend Developer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Contoh: Backend Developer Intern"
-              value={item.role_en || ''}
-              onChange={(e) => setItem({ ...item, role_en: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-            />
+
+            <div>
+              <label className="block text-xs font-semibold text-emerald-300 mb-1.5">
+                🇬🇧 Versi English
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: Backend Developer Intern"
+                value={item.role_en || ''}
+                onChange={(e) => setItem({ ...item, role_en: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+              />
+            </div>
           </div>
         </div>
 
