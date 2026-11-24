@@ -31,7 +31,15 @@ export default function ProjectsTab({
             className="bg-[#0b081e] rounded-2xl overflow-hidden border border-purple-500/20 flex flex-col justify-between shadow-xl"
           >
             <div className="h-40 relative bg-black/40 overflow-hidden">
-              <img src={proj.image_url} alt={proj.title} className="w-full h-full object-cover" />
+              <img
+                src={proj.image_url ? proj.image_url.replace(/&#x2F;/g, '/').replace(/&amp;/g, '&') : 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80'}
+                alt={proj.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80';
+                }}
+              />
               {proj.featured ? (
                 <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950/90 text-purple-200 border border-purple-500/40">
                   Featured

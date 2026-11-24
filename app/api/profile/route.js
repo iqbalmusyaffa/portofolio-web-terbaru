@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
-import { requireAdminAuth, sanitizeString } from '@/lib/security';
+import { requireAdminAuth, sanitizeString, sanitizeUrl } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,13 +71,13 @@ export async function PUT(request) {
     const cleanFullName = sanitizeString(full_name || '', 200);
     const cleanTagline = sanitizeString(tagline || '', 200);
     const cleanBio = sanitizeString(bio || '', 3000);
-    const cleanAvatar = sanitizeString(avatar_url || '', 500);
-    const cleanCv = sanitizeString(cv_url || '', 500);
-    const cleanCvPdf = sanitizeString(cv_pdf_url || '/cv-iqbal-musyaffa.pdf', 500);
-    const cleanGithub = sanitizeString(github_url || '', 255);
-    const cleanLinkedin = sanitizeString(linkedin_url || '', 255);
-    const cleanInstagram = sanitizeString(instagram_url || '', 255);
-    const cleanFacebook = sanitizeString(facebook_url || '', 255);
+    const cleanAvatar = sanitizeUrl(avatar_url || '', 500);
+    const cleanCv = sanitizeUrl(cv_url || '', 500);
+    const cleanCvPdf = sanitizeUrl(cv_pdf_url || '/cv-iqbal-musyaffa.pdf', 500);
+    const cleanGithub = sanitizeUrl(github_url || '', 255);
+    const cleanLinkedin = sanitizeUrl(linkedin_url || '', 255);
+    const cleanInstagram = sanitizeUrl(instagram_url || '', 255);
+    const cleanFacebook = sanitizeUrl(facebook_url || '', 255);
     const cleanEmail = sanitizeString(email || '', 150);
     const cleanLocation = sanitizeString(location || '', 150);
 
@@ -108,8 +108,8 @@ export async function PUT(request) {
     const cleanMetaTitle = sanitizeString(meta_title || `${cleanName} - Software Engineer & Fullstack Developer`, 255);
     const cleanMetaDesc = sanitizeString(meta_description || cleanBio, 1000);
     const cleanMetaKeywords = sanitizeString(meta_keywords || '', 1000);
-    const cleanOgImage = sanitizeString(og_image || cleanAvatar || '/foto2.jpg', 500);
-    const cleanCanonical = sanitizeString(canonical_url || '', 500);
+    const cleanOgImage = sanitizeUrl(og_image || cleanAvatar || '/foto2.jpg', 500);
+    const cleanCanonical = sanitizeUrl(canonical_url || '', 500);
     const cleanGVerify = sanitizeString(google_site_verification || '', 255);
 
     const rolesStr = typeof roles === 'string' ? roles : JSON.stringify(roles || []);

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { query, ensureDatabaseAndTables, getFallbackData } from '@/lib/db';
-import { requireAdminAuth, sanitizeString, parseValidId } from '@/lib/security';
+import { requireAdminAuth, sanitizeString, sanitizeUrl, parseValidId } from '@/lib/security';
 import { cleanTagsToString } from '@/lib/tagUtils';
 
 export const dynamic = 'force-dynamic';
@@ -36,9 +36,9 @@ export async function POST(request) {
     const cleanTitleEn = sanitizeString(title_en || '', 200);
     const cleanDesc = sanitizeString(description || '', 3000);
     const cleanDescEn = sanitizeString(description_en || '', 3000);
-    const cleanLiveUrl = sanitizeString(live_url || '', 500);
-    const cleanGithubUrl = sanitizeString(github_url || '', 500);
-    const cleanImageUrl = sanitizeString(image_url || '', 500);
+    const cleanLiveUrl = sanitizeUrl(live_url || '', 500);
+    const cleanGithubUrl = sanitizeUrl(github_url || '', 500);
+    const cleanImageUrl = sanitizeUrl(image_url || '', 500);
     const tagsStr = cleanTagsToString(tags);
 
     await ensureDatabaseAndTables();
@@ -85,9 +85,9 @@ export async function PUT(request) {
     const cleanTitleEn = sanitizeString(title_en || '', 200);
     const cleanDesc = sanitizeString(description || '', 3000);
     const cleanDescEn = sanitizeString(description_en || '', 3000);
-    const cleanLiveUrl = sanitizeString(live_url || '', 500);
-    const cleanGithubUrl = sanitizeString(github_url || '', 500);
-    const cleanImageUrl = sanitizeString(image_url || '', 500);
+    const cleanLiveUrl = sanitizeUrl(live_url || '', 500);
+    const cleanGithubUrl = sanitizeUrl(github_url || '', 500);
+    const cleanImageUrl = sanitizeUrl(image_url || '', 500);
     const tagsStr = cleanTagsToString(tags);
 
     await ensureDatabaseAndTables();

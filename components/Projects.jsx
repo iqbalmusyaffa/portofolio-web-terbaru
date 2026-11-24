@@ -5,6 +5,17 @@ import { ExternalLink, Github, Star, Info, X } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
 import { cleanTagsList } from '@/lib/tagUtils';
 
+function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') {
+    return 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80';
+  }
+  return url
+    .replace(/&#x2F;/g, '/')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '')
+    .trim();
+}
+
 export default function Projects({ projects }) {
   const { t, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('Semua');
@@ -96,7 +107,7 @@ export default function Projects({ projects }) {
                 {/* Project Image */}
                 <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-[#0c0822]">
                   <img
-                    src={project.image_url || 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80'}
+                    src={formatImageUrl(project.image_url)}
                     alt={project.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                     onError={(e) => {
@@ -214,7 +225,7 @@ export default function Projects({ projects }) {
 
             <div className="h-48 sm:h-56 rounded-2xl overflow-hidden mb-5 bg-gray-100 dark:bg-[#0c0822]">
               <img
-                src={selectedProject.image_url}
+                src={formatImageUrl(selectedProject.image_url)}
                 alt={selectedProject.title}
                 className="w-full h-full object-cover"
               />
