@@ -862,6 +862,13 @@ export default function AdminPage() {
             ? 'Perbarui data yang sudah tersimpan'
             : 'Tambahkan item baru ke portfolio'
         }
+        maxWidth={
+          modalType === 'blog'
+            ? 'max-w-4xl lg:max-w-5xl'
+            : modalType === 'project'
+            ? 'max-w-2xl sm:max-w-3xl'
+            : 'max-w-lg sm:max-w-xl'
+        }
       >
         {modalType === 'project' && editingItem && (
           <ProjectForm

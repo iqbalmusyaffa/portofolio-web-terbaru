@@ -8,6 +8,7 @@ export default function Modal({
   onClose,
   title,
   subtitle,
+  maxWidth = 'max-w-lg sm:max-w-xl',
   children
 }) {
   // Tutup modal dengan keyboard Escape (ESC)
@@ -45,7 +46,7 @@ export default function Modal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0e0a29] max-w-lg sm:max-w-xl w-full rounded-2xl sm:rounded-3xl border border-purple-500/40 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] text-white overflow-hidden relative"
+        className={`bg-[#0e0a29] ${maxWidth} w-full rounded-2xl sm:rounded-3xl border border-purple-500/40 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh] text-white overflow-hidden relative transition-all duration-200`}
       >
         {/* Persistent Modal Header */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-purple-900/40 bg-[#110c30] shrink-0">
