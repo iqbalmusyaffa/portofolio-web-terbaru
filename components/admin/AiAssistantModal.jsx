@@ -12,6 +12,7 @@ export default function AiAssistantModal({
 }) {
   const [inputText, setInputText] = useState(initialText || '');
   const [resultText, setResultText] = useState('');
+  const [usedProvider, setUsedProvider] = useState('');
   const [targetLang, setTargetLang] = useState('en');
   const [mode, setMode] = useState('translate'); // 'translate' | 'polish' | 'generate'
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ export default function AiAssistantModal({
     setError('');
     setIsAuthError(false);
     setResultText('');
+    setUsedProvider('');
 
     try {
       const res = await fetch('/api/ai', {
@@ -48,6 +50,7 @@ export default function AiAssistantModal({
       const data = await res.json();
       if (data.success) {
         setResultText(data.result);
+        if (data.provider) setUsedProvider(data.provider);
       } else {
         if (res.status === 401 || data.isAuthError || (data.error && data.error.includes('Sesi login'))) {
           setIsAuthError(true);
@@ -88,7 +91,7 @@ export default function AiAssistantModal({
             </div>
             <div>
               <h3 className="text-sm font-bold text-white font-heading">{title}</h3>
-              <p className="text-[10px] text-gray-400">Powered by Google Gemini 1.5 Flash</p>
+              <p className="text-[10px] text-purple-300/80 font-medium">Powered by Google Gemini & SumoPod AI</p>
             </div>
           </div>
           <button
@@ -215,7 +218,14 @@ export default function AiAssistantModal({
           {resultText && (
             <div className="p-3.5 rounded-xl bg-[#120e2e] border border-purple-500/30 space-y-2 animate-fadeIn">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-purple-300">Hasil AI:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold text-purple-300">Hasil AI:</span>
+                  {usedProvider && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-medium bg-purple-950/80 text-purple-300 border border-purple-500/30">
+                      {usedProvider}
+                    </span>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={handleCopy}
