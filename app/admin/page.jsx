@@ -739,6 +739,7 @@ export default function AdminPage() {
                 setEditingItem({
                   role: '',
                   company: '',
+                  company_logo: '',
                   period: '',
                   type: 'Work',
                   description: '',
@@ -865,7 +866,7 @@ export default function AdminPage() {
         maxWidth={
           modalType === 'blog'
             ? 'max-w-4xl lg:max-w-5xl'
-            : modalType === 'project'
+            : modalType === 'project' || modalType === 'experience'
             ? 'max-w-2xl sm:max-w-3xl'
             : 'max-w-lg sm:max-w-xl'
         }
@@ -921,6 +922,8 @@ export default function AdminPage() {
               setModalType(null);
               setEditingItem(null);
             }}
+            onUploadFile={handleUploadFile}
+            uploadingImage={uploadingImage}
           />
         )}
 

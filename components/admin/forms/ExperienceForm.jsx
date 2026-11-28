@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Bot, Sparkles, Loader2, Check } from 'lucide-react';
+import { Bot, Sparkles, Loader2, Check, Upload, Building2, Trash2 } from 'lucide-react';
 import SkillTagSelector from '@/components/admin/SkillTagSelector';
 import AiAssistantModal from '@/components/admin/AiAssistantModal';
 
@@ -10,7 +10,9 @@ export default function ExperienceForm({
   setItem,
   skills = [],
   onSubmit,
-  onClose
+  onClose,
+  onUploadFile,
+  uploadingImage = false
 }) {
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [aiTargetField, setAiTargetField] = useState('description');
@@ -175,15 +177,72 @@ export default function ExperienceForm({
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs text-gray-300 mb-1">Perusahaan / Organisasi</label>
-          <input
-            type="text"
-            required
-            value={item.company || ''}
-            onChange={(e) => setItem({ ...item, company: e.target.value })}
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
-          />
+        {/* Perusahaan & Logo Perusahaan */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 mb-1">
+              Perusahaan / Organisasi *
+            </label>
+            <input
+              type="text"
+              required
+              value={item.company || ''}
+              onChange={(e) => setItem({ ...item, company: e.target.value })}
+              placeholder="Contoh: PT PastiDjadi"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-gray-300">
+                Logo Perusahaan
+              </label>
+              {onUploadFile && (
+                <label className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer">
+                  <Upload className="w-3 h-3" />
+                  <span>{uploadingImage ? 'Mengunggah...' : 'Upload Logo'}</span>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    disabled={uploadingImage}
+                    className="hidden"
+                    onChange={(e) => onUploadFile(e, (url) => setItem({ ...item, company_logo: url }))}
+                  />
+                </label>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative w-10 h-10 rounded-xl bg-[#0e0a29] p-1.5 border border-purple-500/30 shrink-0 flex items-center justify-center overflow-hidden">
+                {item.company_logo ? (
+                  <img
+                    src={item.company_logo}
+                    alt="Logo Preview"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <Building2 className="w-5 h-5 text-purple-400/60" />
+                )}
+              </div>
+              <input
+                type="text"
+                value={item.company_logo || ''}
+                onChange={(e) => setItem({ ...item, company_logo: e.target.value })}
+                placeholder="URL logo atau upload gambar..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#16113b] border border-purple-500/30 text-white text-xs focus:outline-none focus:border-purple-400"
+              />
+              {item.company_logo && (
+                <button
+                  type="button"
+                  onClick={() => setItem({ ...item, company_logo: '' })}
+                  className="p-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 transition-colors shrink-0 cursor-pointer"
+                  title="Hapus Logo"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>

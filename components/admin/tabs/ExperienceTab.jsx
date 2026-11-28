@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Building2 } from 'lucide-react';
 
 export default function ExperienceTab({
   experiences = [],
@@ -30,19 +30,34 @@ export default function ExperienceTab({
             key={exp.id}
             className="bg-[#0b081e] p-6 rounded-2xl border border-purple-500/20 flex flex-col sm:flex-row items-start justify-between gap-4 shadow-xl"
           >
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-3">
-                <h3 className="font-bold text-white text-base">{exp.role}</h3>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/30">
-                  {exp.period}
-                </span>
+            <div className="flex items-start gap-4 flex-1">
+              <div className="w-12 h-12 rounded-xl bg-[#140e3d] p-1.5 border border-purple-500/30 shrink-0 flex items-center justify-center overflow-hidden">
+                {exp.company_logo ? (
+                  <img
+                    src={exp.company_logo}
+                    alt={exp.company}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <Building2 className="w-6 h-6 text-purple-400" />
+                )}
               </div>
-              <div className="text-xs font-semibold text-gray-300">
-                {exp.company} • {exp.location}
+
+              <div className="space-y-2 flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="font-bold text-white text-base">{exp.role}</h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/30">
+                    {exp.period}
+                  </span>
+                </div>
+                <div className="text-xs font-semibold text-gray-300 flex items-center gap-2">
+                  <span className="text-purple-300">{exp.company}</span>
+                  {exp.location && <span>• {exp.location}</span>}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">{exp.description}</p>
               </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">{exp.description}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-end sm:self-start shrink-0">
               <button
                 onClick={() => onEdit(exp)}
                 className="p-2 rounded-xl bg-white/5 hover:bg-purple-900/40 text-purple-300 cursor-pointer"

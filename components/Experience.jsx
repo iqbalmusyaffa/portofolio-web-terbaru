@@ -37,24 +37,55 @@ export default function Experience({ experiences }) {
 
                 {/* Card */}
                 <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 group-hover:border-purple-400 dark:group-hover:border-purple-500/40 transition-all duration-300 shadow-md dark:shadow-xl dark:shadow-black/30">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                    <h3 className="text-lg sm:text-xl font-bold font-heading text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-[#a78bfa] transition-colors">
-                      {(language === 'en' && exp.role_en) ? exp.role_en : exp.role}
-                    </h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-500/30 shrink-0 w-fit">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{exp.period}</span>
+                  
+                  {/* Header: Company Logo + Role & Period */}
+                  <div className="flex items-start gap-3.5 sm:gap-4 mb-4">
+                    {/* Logo container */}
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white dark:bg-[#120d36] p-2 border border-purple-200/80 dark:border-purple-500/30 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:border-purple-400 dark:group-hover:border-purple-400/60 transition-all overflow-hidden">
+                      {exp.company_logo ? (
+                        <img
+                          src={exp.company_logo}
+                          alt={exp.company}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            if (e.currentTarget.nextElementSibling) {
+                              e.currentTarget.nextElementSibling.style.display = 'block';
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <Building2
+                        className={`w-6 h-6 sm:w-7 sm:h-7 text-[#8245ec] ${exp.company_logo ? 'hidden' : 'block'}`}
+                      />
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
-                    <Building2 className="w-4 h-4 text-[#8245ec]" />
-                    <span>{exp.company}</span>
-                    {exp.location && (
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
-                        • <MapPin className="w-3 h-3" /> {exp.location}
-                      </span>
-                    )}
+                    {/* Role, Company, Period */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 mb-1.5">
+                        <h3 className="text-lg sm:text-xl font-bold font-heading text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-[#a78bfa] transition-colors leading-snug">
+                          {(language === 'en' && exp.role_en) ? exp.role_en : exp.role}
+                        </h3>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-500/30 shrink-0 w-fit">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{exp.period}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <span className="text-purple-700 dark:text-purple-300 font-bold">{exp.company}</span>
+                        {exp.type && (
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20">
+                            {exp.type}
+                          </span>
+                        )}
+                        {exp.location && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 font-normal">
+                            • <MapPin className="w-3 h-3 text-purple-500" /> {exp.location}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5">

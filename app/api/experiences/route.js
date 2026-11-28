@@ -25,7 +25,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { role, role_en, company, period, type = 'Work', description, description_en, technologies, location } = body;
+    const { role, role_en, company, company_logo, period, type = 'Work', description, description_en, technologies, location } = body;
 
     if (!role || !company || !period) {
       return NextResponse.json({ success: false, error: 'Posisi, perusahaan, dan periode wajib diisi' }, { status: 400 });
@@ -34,6 +34,7 @@ export async function POST(request) {
     const cleanRole = sanitizeString(role, 150);
     const cleanRoleEn = sanitizeString(role_en || '', 150);
     const cleanCompany = sanitizeString(company, 150);
+    const cleanCompanyLogo = sanitizeString(company_logo || '', 500);
     const cleanPeriod = sanitizeString(period, 100);
     const cleanType = sanitizeString(type, 50);
     const cleanDesc = sanitizeString(description || '', 3000);
@@ -43,11 +44,11 @@ export async function POST(request) {
 
     await ensureDatabaseAndTables();
     const result = await query(
-      'INSERT INTO experiences (role, role_en, company, period, type, description, description_en, technologies, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [cleanRole, cleanRoleEn, cleanCompany, cleanPeriod, cleanType, cleanDesc, cleanDescEn, techStr, cleanLoc]
+      'INSERT INTO experiences (role, role_en, company, company_logo, period, type, description, description_en, technologies, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [cleanRole, cleanRoleEn, cleanCompany, cleanCompanyLogo, cleanPeriod, cleanType, cleanDesc, cleanDescEn, techStr, cleanLoc]
     );
 
-    const newExp = { id: result.insertId || Date.now(), role: cleanRole, role_en: cleanRoleEn, company: cleanCompany, period: cleanPeriod, type: cleanType, description: cleanDesc, description_en: cleanDescEn, technologies: techStr, location: cleanLoc };
+    const newExp = { id: result.insertId || Date.now(), role: cleanRole, role_en: cleanRoleEn, company: cleanCompany, company_logo: cleanCompanyLogo, period: cleanPeriod, type: cleanType, description: cleanDesc, description_en: cleanDescEn, technologies: techStr, location: cleanLoc };
     getFallbackData().experiences.unshift(newExp);
 
     return NextResponse.json({ success: true, data: newExp });
@@ -64,7 +65,7 @@ export async function PUT(request) {
   try {
     const body = await request.json();
     const id = parseValidId(body.id);
-    const { role, role_en, company, period, type = 'Work', description, description_en, technologies, location } = body;
+    const { role, role_en, company, company_logo, period, type = 'Work', description, description_en, technologies, location } = body;
 
     if (!id || !role || !company || !period) {
       return NextResponse.json({ success: false, error: 'ID, Posisi, perusahaan, dan periode wajib diisi' }, { status: 400 });
@@ -73,6 +74,7 @@ export async function PUT(request) {
     const cleanRole = sanitizeString(role, 150);
     const cleanRoleEn = sanitizeString(role_en || '', 150);
     const cleanCompany = sanitizeString(company, 150);
+    const cleanCompanyLogo = sanitizeString(company_logo || '', 500);
     const cleanPeriod = sanitizeString(period, 100);
     const cleanType = sanitizeString(type, 50);
     const cleanDesc = sanitizeString(description || '', 3000);
@@ -82,14 +84,14 @@ export async function PUT(request) {
 
     await ensureDatabaseAndTables();
     await query(
-      'UPDATE experiences SET role = ?, role_en = ?, company = ?, period = ?, type = ?, description = ?, description_en = ?, technologies = ?, location = ? WHERE id = ?',
-      [cleanRole, cleanRoleEn, cleanCompany, cleanPeriod, cleanType, cleanDesc, cleanDescEn, techStr, cleanLoc, id]
+      'UPDATE experiences SET role = ?, role_en = ?, company = ?, company_logo = ?, period = ?, type = ?, description = ?, description_en = ?, technologies = ?, location = ? WHERE id = ?',
+      [cleanRole, cleanRoleEn, cleanCompany, cleanCompanyLogo, cleanPeriod, cleanType, cleanDesc, cleanDescEn, techStr, cleanLoc, id]
     );
 
     const list = getFallbackData().experiences;
     const idx = list.findIndex(e => e.id === id);
     if (idx !== -1) {
-      list[idx] = { id, role: cleanRole, role_en: cleanRoleEn, company: cleanCompany, period: cleanPeriod, type: cleanType, description: cleanDesc, description_en: cleanDescEn, technologies: techStr, location: cleanLoc };
+      list[idx] = { id, role: cleanRole, role_en: cleanRoleEn, company: cleanCompany, company_logo: cleanCompanyLogo, period: cleanPeriod, type: cleanType, description: cleanDesc, description_en: cleanDescEn, technologies: techStr, location: cleanLoc };
     }
 
     return NextResponse.json({ success: true, message: 'Pengalaman berhasil diperbarui' });
