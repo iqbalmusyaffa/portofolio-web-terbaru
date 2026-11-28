@@ -288,3 +288,47 @@ export async function DELETE(request) {
     return errorResponse('Gagal menghapus artikel blog', 500);
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+    const { slug, id } = body;
+
+    if (!slug && !id) {
+      return errorResponse('Slug atau ID artikel wajib disertakan', 400);
+    }
+
+    await ensureDatabaseAndTables();
+
+    let updatedClaps = 1;
+
+    if (slug) {
+      await query('UPDATE blogs SET claps = COALESCE(claps, 0) + 1 WHERE slug = ?', [slug]);
+      const rows = await query('SELECT claps FROM blogs WHERE slug = ? LIMIT 1', [slug]);
+      if (rows && rows.length > 0) {
+        updatedClaps = rows[0].claps;
+      }
+    } else if (id) {
+      const validId = parseValidId(id);
+      await query('UPDATE blogs SET claps = COALESCE(claps, 0) + 1 WHERE id = ?', [validId]);
+      const rows = await query('SELECT claps FROM blogs WHERE id = ? LIMIT 1', [validId]);
+      if (rows && rows.length > 0) {
+        updatedClaps = rows[0].claps;
+      }
+    }
+
+    // In-memory fallback support
+    if (getFallbackData().blogs) {
+      const b = getFallbackData().blogs.find(item => item.slug === slug || item.id === id);
+      if (b) {
+        b.claps = (b.claps || 0) + 1;
+        updatedClaps = b.claps;
+      }
+    }
+
+    return successResponse({ claps: updatedClaps });
+  } catch (err) {
+    console.error('Error incrementing claps:', err);
+    return errorResponse('Gagal menambahkan apresiasi', 500);
+  }
+}
