@@ -11,9 +11,11 @@ const GEMINI_CANDIDATE_MODELS = [
 ];
 
 const SUMOPOD_CANDIDATE_MODELS = [
-  process.env.SUMOPOD_MODEL || 'deepseek/deepseek-chat',
-  'deepseek-chat',
-  'gpt-4o-mini'
+  process.env.SUMOPOD_MODEL || 'deepseek-flash',
+  'deepseek-flash',
+  'deepseek-v4-flash',
+  'deepseek-v4.1-flash-1017',
+  'glm-5.3-flash'
 ];
 
 async function callGoogleGemini({ systemInstruction, userPrompt, apiKey }) {
