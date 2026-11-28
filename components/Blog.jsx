@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles, Filter, X } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
-import BlogModal from './BlogModal';
 import { cleanTagsList } from '@/lib/tagUtils';
 
 function formatImageUrl(url) {
@@ -21,7 +21,6 @@ export default function Blog({ blogs = [] }) {
   const { t, language } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBlog, setSelectedBlog] = useState(null);
 
   // Extract unique categories dynamically
   const categories = useMemo(() => {
@@ -139,10 +138,10 @@ export default function Blog({ blogs = [] }) {
               const tags = cleanTagsList(blog.tags);
 
               return (
-                <article
+                <Link
                   key={blog.id || blog.slug}
-                  onClick={() => setSelectedBlog(blog)}
-                  className="group relative bg-white dark:bg-[#0b081e] rounded-3xl overflow-hidden border border-gray-200 dark:border-purple-500/20 shadow-lg hover:shadow-2xl hover:border-purple-500/50 transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1"
+                  href={`/blog/${blog.slug}`}
+                  className="group relative bg-white dark:bg-[#0b081e] rounded-3xl overflow-hidden border border-gray-200 dark:border-purple-500/20 shadow-lg hover:shadow-2xl hover:border-purple-500/50 transition-all duration-300 flex flex-col justify-between transform hover:-translate-y-1 block"
                 >
                   {/* Top Image & Badge */}
                   <div>
@@ -219,7 +218,7 @@ export default function Blog({ blogs = [] }) {
                     <span>{t('blog.read_more')}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>
@@ -240,14 +239,6 @@ export default function Blog({ blogs = [] }) {
           </div>
         )}
       </div>
-
-      {/* Full Article Modal */}
-      {selectedBlog && (
-        <BlogModal
-          blog={selectedBlog}
-          onClose={() => setSelectedBlog(null)}
-        />
-      )}
     </section>
   );
 }

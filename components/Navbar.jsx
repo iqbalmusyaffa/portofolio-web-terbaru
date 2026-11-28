@@ -40,14 +40,14 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: t('nav.about'), id: 'about', href: '#about' },
-    { name: t('nav.skills'), id: 'skills', href: '#skills' },
-    { name: t('nav.experience'), id: 'experience', href: '#experience' },
-    { name: t('nav.education'), id: 'education', href: '#education' },
-    { name: t('nav.projects'), id: 'projects', href: '#projects' },
-    { name: t('nav.blog'), id: 'blog', href: '#blog' },
-    { name: t('nav.certifications'), id: 'certifications', href: '#certifications' },
-    { name: t('nav.contact'), id: 'contact', href: '#contact' },
+    { name: t('nav.about'), id: 'about', href: '/#about' },
+    { name: t('nav.skills'), id: 'skills', href: '/#skills' },
+    { name: t('nav.experience'), id: 'experience', href: '/#experience' },
+    { name: t('nav.education'), id: 'education', href: '/#education' },
+    { name: t('nav.projects'), id: 'projects', href: '/#projects' },
+    { name: t('nav.blog'), id: 'blog', href: '/#blog' },
+    { name: t('nav.certifications'), id: 'certifications', href: '/#certifications' },
+    { name: t('nav.contact'), id: 'contact', href: '/#contact' },
   ];
 
   return (
